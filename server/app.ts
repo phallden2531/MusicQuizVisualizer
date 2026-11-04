@@ -95,13 +95,13 @@ export async function createApplication(options: Options) {
     const quiz = quizSchema.parse(req.body);
     for (const song of quiz.songs) {
       if (song.audioId) {
-        const audio = await service.storage.getAsset(song.audioId);
-        requireRule(audio?.info.kind === 'audio', 'Audio file not found. Upload it again.');
-        song.durationMs = audio.info.durationMs!;
+        const audio = await service.storage.getAssetInfo(song.audioId);
+        requireRule(audio?.kind === 'audio', 'Audio file not found. Upload it again.');
+        song.durationMs = audio.durationMs!;
       } else song.durationMs = 0;
       if (song.imageId) {
-        const image = await service.storage.getAsset(song.imageId);
-        requireRule(image?.info.kind === 'image', 'Picture not found. Upload it again.');
+        const image = await service.storage.getAssetInfo(song.imageId);
+        requireRule(image?.kind === 'image', 'Picture not found. Upload it again.');
       }
       requireRule(
         !song.correctColleagueId || quiz.colleagues.some((c) => c.id === song.correctColleagueId),
@@ -125,37 +125,36 @@ export async function createApplication(options: Options) {
     await service.storage.putAsset(info, req.file.buffer);
     res.status(201).json(info);
   });
-  async function sendAsset(req: Request, res: Response, id: string) {
-    const asset = await service.storage.getAsset(id);
-    requireRule(asset, 'Media not found.', 404);
-    res.type(asset.info.contentType);
+  /** Sends media, reading only the requested byte range from storage. */
+  async function sendAsset(req: Request, res: Response, id: string, cacheControl: string) {
+    const info = await service.storage.getAssetInfo(id);
+    requireRule(info, 'Media not found.', 404);
+    const size = info.size;
+    res.type(info.contentType);
     res.setHeader('Accept-Ranges', 'bytes');
+    res.setHeader('Cache-Control', cacheControl);
     const range = req.get('range');
     if (range) {
       const match = /^bytes=(\d*)-(\d*)$/.exec(range);
-      if (!match) {
-        res.status(416).set('Content-Range', `bytes */${asset.data.length}`).end();
+      const start = match?.[1] ? Number(match[1]) : Math.max(0, size - Number(match?.[2]));
+      const end = match?.[1] && match[2] ? Math.min(Number(match[2]), size - 1) : size - 1;
+      if (!match || !Number.isSafeInteger(start) || start > end || start >= size) {
+        res.status(416).set('Content-Range', `bytes */${size}`).end();
         return;
       }
-      const start = match[1] ? Number(match[1]) : Math.max(0, asset.data.length - Number(match[2]));
-      const end =
-        match[1] && match[2]
-          ? Math.min(Number(match[2]), asset.data.length - 1)
-          : asset.data.length - 1;
-      if (!Number.isSafeInteger(start) || start > end || start >= asset.data.length) {
-        res.status(416).set('Content-Range', `bytes */${asset.data.length}`).end();
-        return;
-      }
-      res
-        .status(206)
-        .set('Content-Range', `bytes ${start}-${end}/${asset.data.length}`)
-        .send(asset.data.subarray(start, end + 1));
+      const data = await service.storage.readAsset(id, { start, end });
+      requireRule(data, 'Media not found.', 404);
+      res.status(206).set('Content-Range', `bytes ${start}-${end}/${size}`).send(data);
       return;
     }
-    res.send(asset.data);
+    const data = await service.storage.readAsset(id);
+    requireRule(data, 'Media not found.', 404);
+    res.send(data);
   }
+  // Asset IDs are never reused, so their content never changes.
+  const immutable = 'private, max-age=31536000, immutable';
   app.get('/api/assets/:id', auth.requireHost, async (req, res) => {
-    await sendAsset(req, res, String(req.params.id));
+    await sendAsset(req, res, String(req.params.id), immutable);
   });
   app.post('/api/games', auth.requireHost, async (_req, res) => {
     const game = await service.newGame();
@@ -164,6 +163,10 @@ export async function createApplication(options: Options) {
   app.post('/api/game/command', auth.requireHost, async (req, res) => {
     const { command, requestId, runId } = commandSchema.parse(req.body);
     await service.command(command, requestId, runId);
+    res.json({ ok: true });
+  });
+  app.delete('/api/game/players/:id', auth.requireHost, async (req, res) => {
+    await service.removePlayer(String(req.params.id));
     res.json({ ok: true });
   });
   app.post(
@@ -196,18 +199,19 @@ export async function createApplication(options: Options) {
     );
     const song = game.quiz.songs[game.roundIndex];
     requireRule(song, 'No picture available.', 404);
-    await sendAsset(req, res, song.imageId);
+    await sendAsset(req, res, song.imageId, 'no-store');
   });
   app.get('/api/games/:roomCode/audio/:songId', auth.requireHost, async (req, res) => {
     const song = service
       .getGame(String(req.params.roomCode))
       .quiz.songs.find((s) => s.id === req.params.songId);
     requireRule(song, 'Song not found.', 404);
-    await sendAsset(req, res, song.audioId);
+    // A game freezes its songs, so a room's song URL always means the same audio.
+    await sendAsset(req, res, song.audioId, 'private, max-age=86400');
   });
   app.use('/api', (_req, res) => res.status(404).json({ error: 'Endpoint not found.' }));
 
-  const errorHandler: ErrorRequestHandler = (error, _req, res, _next) => {
+  const errorHandler: ErrorRequestHandler = (error, req, res, _next) => {
     if (res.headersSent) return;
     if (error instanceof z.ZodError) {
       res.status(400).json({ error: error.issues[0]?.message ?? 'Invalid request.' });
@@ -237,7 +241,12 @@ export async function createApplication(options: Options) {
         message: error instanceof Error ? error.message : 'Unknown error',
       }),
     );
-    res.status(503).json({ error: 'Could not save the change. Please try again.' });
+    res.status(503).json({
+      error:
+        req.method === 'GET'
+          ? 'Could not load this right now. Please try again.'
+          : 'Could not save the change. Please try again.',
+    });
   };
   app.use(errorHandler);
 

@@ -6,10 +6,12 @@ import {
   advance,
   createGame,
   endAudio,
+  finishGame,
   joinGame,
   pause,
   project,
   recover,
+  removePlayer,
   requireRule,
   resume,
   reveal,
@@ -17,12 +19,17 @@ import {
   submitAnswer,
 } from './game.js';
 
+const HEARTBEAT_SAVE_MS = 10000;
+const STALL_MS = 8000;
+const mediaIds = (quiz: Quiz) => quiz.songs.flatMap((s) => [s.audioId, s.imageId]).filter(Boolean);
+
 export class QuizService extends EventEmitter {
   state: AppState;
   screenId: string | null = null;
   readySongId: string | null = null;
   connectedPlayers = new Map<string, Set<string>>();
   private queue: Promise<unknown> = Promise.resolve();
+  private savedAt = 0;
   private constructor(
     public storage: Storage,
     private now: () => number,
@@ -47,31 +54,69 @@ export class QuizService extends EventEmitter {
     }
     return new QuizService(storage, now, state);
   }
-  private mutate<T>(operation: (state: AppState, now: number) => T): Promise<T> {
+  /**
+   * Applies one change in arrival order, persists it, then publishes it.
+   * Unchanged state is neither written nor published. A heartbeat only refreshes
+   * playback bookkeeping that nobody watches live, so it is kept in memory and
+   * saved at most every HEARTBEAT_SAVE_MS for crash recovery.
+   */
+  private mutate<T>(operation: (state: AppState, now: number) => T, heartbeat = false): Promise<T> {
     // Capture arrival before waiting on earlier Blob writes. Queue latency must
     // never change an answer's score or its eligibility at the deadline.
     const receivedAt = this.now();
     const task = this.queue.then(async () => {
+      const before = JSON.stringify(this.state);
       const draft = structuredClone(this.state);
       const now = receivedAt;
       if (draft.game) advance(draft.game, now);
       const result = operation(draft, now);
+      if (JSON.stringify(draft) === before) return result;
+      if (heartbeat && now - this.savedAt < HEARTBEAT_SAVE_MS) {
+        this.state = draft;
+        return result;
+      }
       draft.revision++;
       await this.storage.writeState(draft);
       this.state = draft;
-      this.emit('change');
+      this.savedAt = now;
+      if (!heartbeat) this.emit('change');
       return result;
     });
     this.queue = task.catch(() => {});
     return task;
   }
+  /** Deletes media no longer referenced by the quiz or the live game. Best effort. */
+  private async deleteUnused(candidates: Iterable<string>) {
+    const kept = new Set([
+      ...mediaIds(this.state.quiz),
+      ...(this.state.game ? mediaIds(this.state.game.quiz) : []),
+    ]);
+    for (const id of new Set(candidates)) {
+      if (kept.has(id)) continue;
+      await this.storage
+        .deleteAsset(id)
+        .catch((error: Error) =>
+          console.error(
+            JSON.stringify({
+              level: 'error',
+              event: 'media_delete_failed',
+              message: error.message,
+            }),
+          ),
+        );
+    }
+  }
   async saveQuiz(quiz: Quiz) {
-    return this.mutate((state) => {
+    const previous = mediaIds(this.state.quiz);
+    const saved = await this.mutate((state) => {
       state.quiz = structuredClone(quiz);
       return state.quiz;
     });
+    await this.deleteUnused(previous);
+    return saved;
   }
   async newGame() {
+    const previous = this.state.game ? mediaIds(this.state.game.quiz) : [];
     const game = await this.mutate((state, now) => {
       requireRule(
         !state.game || ['lobby', 'finished'].includes(state.game.phase),
@@ -84,6 +129,7 @@ export class QuizService extends EventEmitter {
     });
     this.readySongId = null;
     this.emit('change');
+    await this.deleteUnused(previous);
     return game;
   }
   getGame(roomCode?: string): Game {
@@ -106,6 +152,12 @@ export class QuizService extends EventEmitter {
       const player = { id: randomUUID(), token: randomBytes(32).toString('hex'), name };
       joinGame(game, player.id, player.token, player.name);
       return player;
+    });
+  }
+  async removePlayer(playerId: string) {
+    await this.mutate((state) => {
+      requireRule(state.game, 'Create a game first.');
+      removePlayer(state.game, playerId);
     });
   }
   player(roomCode: string, token: string | undefined) {
@@ -192,12 +244,7 @@ export class QuizService extends EventEmitter {
         );
         resume(game, now);
       } else if (command === 'reveal') reveal(game, now);
-      else {
-        game.phase = 'finished';
-        game.paused = false;
-        game.clockAt = null;
-        game.deadline = null;
-      }
+      else finishGame(game);
       state.commandIds = [...(state.commandIds ?? []), requestId].slice(-200);
     });
   }
@@ -245,7 +292,7 @@ export class QuizService extends EventEmitter {
         requireRule(positionMs >= duration - 2000, 'The song has not finished.');
         endAudio(game, now, runId);
       }
-    });
+    }, event === 'progress');
   }
   async tick() {
     const game = this.state.game;
@@ -254,16 +301,23 @@ export class QuizService extends EventEmitter {
     const timedTransition =
       (game.phase === 'grace' && game.deadline !== null && now >= game.deadline) ||
       (game.phase === 'revealing' && game.revealEndsAt !== null && now >= game.revealEndsAt);
-    const stalled = game.phase === 'playing' && now - game.heartbeatAt > 8000;
+    const stalled = game.phase === 'playing' && now - game.heartbeatAt > STALL_MS;
     if (timedTransition || stalled)
       await this.mutate((state, currentNow) => {
-        advance(state.game!, currentNow);
-        if (state.game!.phase === 'playing' && currentNow - state.game!.heartbeatAt > 8000)
+        const live = state.game!;
+        advance(live, currentNow);
+        if (live.phase === 'playing' && currentNow - live.heartbeatAt > STALL_MS) {
+          // Stop the clock where the audio stopped, so silence costs nobody points.
+          // Never before a guess already recorded, which keeps elapsed times ordered.
+          const answeredAt = Object.values(live.answers[live.roundIndex] ?? {}).map(
+            (a) => a.submittedAt,
+          );
           pause(
-            state.game!,
-            currentNow,
+            live,
+            Math.max(live.heartbeatAt, live.clockAt ?? 0, ...answeredAt),
             'Audio connection interrupted. Check the presentation screen, then resume.',
           );
+        }
       });
   }
 }

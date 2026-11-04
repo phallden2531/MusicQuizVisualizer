@@ -12,6 +12,8 @@ import {
   project,
   recover,
   score,
+  finishGame,
+  removePlayer,
 } from '../server/game';
 import type { Quiz } from '../shared/types';
 
@@ -142,5 +144,88 @@ describe('live quiz rules', () => {
     expect(standings.map((p) => p.rank)).toEqual([1, 1]);
     startRound(game, 90000);
     expect(game.phase).toBe('finished');
+  });
+  it('stops offering audio to the presentation once the game has finished', () => {
+    const game = playing();
+    endAudio(game, 61000, game.runId);
+    advance(game, 76000);
+    reveal(game, 80000);
+    advance(game, 85000);
+    startRound(game, 90000);
+    const view = project(game, 'screen', undefined, 90000);
+    expect(view.phase).toBe('finished');
+    expect(view.audioUrl).toBeUndefined();
+    expect(view.audioSongId).toBeUndefined();
+  });
+  it('requires a title on every song before a game can be created', () => {
+    const untitled = structuredClone(quiz);
+    untitled.songs[0].title = ' ';
+    expect(() => createGame(untitled, 'ABC123', 0)).toThrow(/title/i);
+  });
+  it('voids the unfinished round when the host ends the game early', () => {
+    const game = playing();
+    submitAnswer(game, 'p1', 'sam', 2000);
+    finishGame(game);
+    const view = project(game, 'player', 'p1', 3000);
+    expect(view.phase).toBe('finished');
+    expect(view.standings[0].score).toBe(0);
+    expect(view.correctName).toBeUndefined();
+  });
+  it('keeps completed rounds when the host ends the game after a result', () => {
+    const game = playing();
+    submitAnswer(game, 'p1', 'sam', 1000);
+    endAudio(game, 61000, game.runId);
+    advance(game, 76000);
+    reveal(game, 80000);
+    advance(game, 85000);
+    finishGame(game);
+    expect(project(game, 'player', 'p1', 86000).standings[0].score).toBe(1000);
+  });
+  it('lets the host remove a player only before the first song', () => {
+    const game = createGame(quiz, 'ABC123', 0);
+    joinGame(game, 'p1', 't1', 'One');
+    joinGame(game, 'p2', 't2', 'Two');
+    removePlayer(game, 'p1');
+    expect(game.players.map((p) => p.id)).toEqual(['p2']);
+    expect(() => removePlayer(game, 'missing')).toThrow(/not found/i);
+    startRound(game, 1000);
+    expect(() => removePlayer(game, 'p2')).toThrow(/lobby/i);
+  });
+  it('shows how the room voted only once the result is revealed', () => {
+    const game = createGame(quiz, 'ABC123', 0);
+    joinGame(game, 'p1', 't1', 'One');
+    joinGame(game, 'p2', 't2', 'Two');
+    joinGame(game, 'p3', 't3', 'Three');
+    startRound(game, 1000);
+    submitAnswer(game, 'p1', 'alex', 2000);
+    submitAnswer(game, 'p2', 'alex', 2000);
+    submitAnswer(game, 'p3', 'sam', 2000);
+    endAudio(game, 61000, game.runId);
+    advance(game, 76000);
+    expect(project(game, 'screen', undefined, 76000).votes).toBeUndefined();
+    reveal(game, 80000);
+    expect(project(game, 'player', 'p1', 81000).votes).toBeUndefined();
+    advance(game, 85000);
+    expect(project(game, 'player', 'p1', 85000).votes).toEqual([
+      { colleagueId: 'alex', name: 'Alex', count: 2, correct: false },
+      { colleagueId: 'sam', name: 'Sam', count: 1, correct: true },
+    ]);
+  });
+  it('tells only the host the song title, playback position and who has guessed', () => {
+    const game = playing();
+    game.playbackPositionMs = 4000;
+    game.heartbeatAt = 5000;
+    submitAnswer(game, 'p1', 'sam', 6000);
+    const host = project(game, 'host', undefined, 7000);
+    expect(host.currentSongTitle).toBe('Secret title');
+    expect(host.playbackPositionMs).toBe(4000);
+    expect(host.playbackAt).toBe(5000);
+    expect(host.audioDurationMs).toBe(60000);
+    expect(host.players[0].answered).toBe(true);
+    for (const role of ['player', 'screen'] as const) {
+      const view = project(game, role, role === 'player' ? 'p1' : undefined, 7000);
+      expect(view.currentSongTitle).toBeUndefined();
+      expect(view.players[0].answered).toBeUndefined();
+    }
   });
 });

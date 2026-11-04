@@ -4,24 +4,40 @@ import { randomUUID } from 'node:crypto';
 import type { AssetInfo } from '../shared/types.js';
 import { requireRule } from './game.js';
 
-const id = z.string().regex(/^[a-zA-Z0-9_-]{1,80}$/);
+const id = z.string().regex(/^[a-zA-Z0-9_-]{1,80}$/, 'Something in the quiz is malformed.');
 export const quizSchema = z
   .object({
-    title: z.string().trim().min(1).max(120),
-    colleagues: z.array(z.object({ id, name: z.string().trim().min(1).max(80) })).max(100),
+    title: z
+      .string()
+      .trim()
+      .min(1, 'Give the quiz a title.')
+      .max(120, 'Keep the quiz title under 120 characters.'),
+    colleagues: z
+      .array(
+        z.object({
+          id,
+          name: z
+            .string()
+            .trim()
+            .min(1, 'Every colleague needs a name.')
+            .max(80, 'Keep colleague names under 80 characters.'),
+        }),
+      )
+      .max(100, 'Add at most 100 colleagues.'),
     songs: z
       .array(
         z.object({
           id,
-          title: z.string().trim().min(1).max(120),
-          lyrics: z.string().max(30000),
+          // Drafts may be untitled; a game cannot start until every song has a title.
+          title: z.string().trim().max(120, 'Keep song titles under 120 characters.'),
+          lyrics: z.string().max(30000, 'Keep lyrics under 30,000 characters.'),
           audioId: z.union([id, z.literal('')]),
           imageId: z.union([id, z.literal('')]),
           durationMs: z.number().finite().min(0).max(1800000),
           correctColleagueId: z.union([id, z.literal('')]),
         }),
       )
-      .max(50),
+      .max(50, 'Add at most 50 songs.'),
   })
   .superRefine((quiz, ctx) => {
     for (const list of [quiz.colleagues, quiz.songs]) {

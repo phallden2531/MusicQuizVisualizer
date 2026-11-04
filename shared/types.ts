@@ -53,6 +53,12 @@ export interface Standing {
   score: number;
   roundPoints: number;
 }
+export interface Vote {
+  colleagueId: string;
+  name: string;
+  count: number;
+  correct: boolean;
+}
 export interface GameView {
   roomCode: string;
   title: string;
@@ -65,7 +71,7 @@ export interface GameView {
   serverNow: number;
   lyrics?: string;
   colleagues: Colleague[];
-  players: { id: string; name: string; connected: boolean }[];
+  players: { id: string; name: string; connected: boolean; answered?: boolean }[];
   answerCount: number;
   standings: Standing[];
   myAnswer?: { colleagueId: string };
@@ -79,6 +85,9 @@ export interface GameView {
   audioSongId?: string;
   audioDurationMs?: number;
   playbackPositionMs?: number;
+  playbackAt?: number;
+  currentSongTitle?: string;
+  votes?: Vote[];
   screenConnected?: boolean;
   screenReady?: boolean;
   nextSongTitle?: string;

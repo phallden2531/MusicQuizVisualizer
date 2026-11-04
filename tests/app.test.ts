@@ -130,6 +130,61 @@ describe('host setup and access', () => {
     quiz.songs[0].imageId = quiz.songs[0].audioId;
     expect((await agent.put('/api/quiz').send(quiz)).status).toBe(400);
   });
+  it('saves an untitled draft song and explains invalid input in plain words', async () => {
+    const { agent } = await host();
+    const draft = {
+      title: 'Team quiz',
+      colleagues: [{ id: 'alex', name: 'Alex' }],
+      songs: [
+        {
+          id: 'draft',
+          title: '',
+          lyrics: '',
+          audioId: '',
+          imageId: '',
+          durationMs: 0,
+          correctColleagueId: '',
+        },
+      ],
+    };
+    expect((await agent.put('/api/quiz').send(draft)).status).toBe(200);
+    draft.colleagues[0].name = ' ';
+    const invalid = await agent.put('/api/quiz').send(draft);
+    expect(invalid.status).toBe(400);
+    expect(invalid.body.error).toBe('Every colleague needs a name.');
+  });
+  it('serves byte ranges and lets browsers cache media that never changes', async () => {
+    const { agent, quiz } = await prepare();
+    const full = await agent.get(`/api/assets/${quiz.songs[0].audioId}`);
+    expect(full.status).toBe(200);
+    expect(full.headers['cache-control']).toBe('private, max-age=31536000, immutable');
+    const part = await agent
+      .get(`/api/assets/${quiz.songs[0].audioId}`)
+      .set('Range', 'bytes=10-19')
+      .buffer(true)
+      .parse((res, done) => {
+        const chunks: Buffer[] = [];
+        res.on('data', (c: Buffer) => chunks.push(c));
+        res.on('end', () => done(null, Buffer.concat(chunks)));
+      });
+    expect(part.status).toBe(206);
+    expect(part.headers['content-range']).toBe(`bytes 10-19/${full.body.length}`);
+    expect((part.body as Buffer).equals(full.body.subarray(10, 20))).toBe(true);
+    expect((await agent.get('/api/assets/missing-id')).status).toBe(404);
+  });
+  it('lets the host remove a player from the lobby', async () => {
+    const { agent, room } = await prepare();
+    const joined = await request(runtime.app)
+      .post(`/api/games/${room}/join`)
+      .send({ name: 'Prankster' });
+    expect((await request(runtime.app).delete(`/api/game/players/${joined.body.id}`)).status).toBe(
+      401,
+    );
+    expect((await agent.delete(`/api/game/players/${joined.body.id}`)).status).toBe(200);
+    await expect(
+      socket({ role: 'player', roomCode: room, token: joined.body.token }),
+    ).rejects.toThrow(/join/i);
+  });
 });
 describe('live transport', () => {
   it('keeps all 15 connected players synchronized through a complete round', async () => {

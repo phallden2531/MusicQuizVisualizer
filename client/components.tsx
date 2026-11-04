@@ -1,7 +1,7 @@
-import { useEffect, useState, type ReactNode } from 'react';
-import { ArrowUpRight, AudioLines, Check, Disc3, Trophy, WifiOff } from 'lucide-react';
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
+import { ArrowUpRight, AudioLines, Check, Disc3, Pause, Trophy, WifiOff } from 'lucide-react';
 import QRCode from 'qrcode';
-import type { GameView, Standing } from '../shared/types';
+import type { GameView, Standing, Vote } from '../shared/types';
 
 export function Brand({ small = false }: { small?: boolean }) {
   return (
@@ -37,7 +37,7 @@ export function ConnectionNotice({ connected, error }: { connected: boolean; err
   return !connected ? (
     <div className="notice connection-notice" role="status">
       <WifiOff size={16} />
-      {error || 'Connecting to the room… Your guess is safe.'}
+      {error || 'Reconnecting to the room…'}
     </div>
   ) : null;
 }
@@ -104,14 +104,15 @@ export function QR({ value }: { value: string }) {
 export function Standings({
   standings,
   playerId,
-  compact = false,
+  columns = false,
 }: {
   standings: Standing[];
   playerId?: string;
-  compact?: boolean;
+  /** Two columns, for a full room on the projector. */
+  columns?: boolean;
 }) {
   return (
-    <div className={`standings ${compact ? 'standings-compact' : ''}`}>
+    <div className={`standings ${columns ? 'standings-columns' : ''}`}>
       <div className="standings-label">
         <span>PLAYER</span>
         <span>POINTS</span>
@@ -119,8 +120,8 @@ export function Standings({
       {standings.length === 0 && <p className="muted">The guest list is still open.</p>}
       {standings.map((p) => (
         <div className={`standing ${p.id === playerId ? 'standing-me' : ''}`} key={p.id}>
-          <span className={`rank rank-${p.rank}`}>
-            {p.rank === 1 ? <Trophy size={17} /> : String(p.rank).padStart(2, '0')}
+          <span className={`rank ${leads(p) ? 'rank-1' : ''}`}>
+            {leads(p) ? <Trophy size={17} /> : String(p.rank).padStart(2, '0')}
           </span>
           <span className="standing-name">
             {p.name}
@@ -133,6 +134,8 @@ export function Standings({
     </div>
   );
 }
+/** A trophy means something only once somebody has actually scored. */
+export const leads = (p: Standing) => p.rank === 1 && p.score > 0;
 export function RoundTag({ state }: { state: GameView }) {
   return (
     <span className="round-tag">
@@ -151,10 +154,17 @@ export function Countdown({ state, now }: { state: GameView; now: number }) {
         <span className="eyebrow">THE MUSIC HAS STOPPED</span>
         <strong>Last call for guesses</strong>
       </div>
-      <span className="countdown-number">
-        {seconds ?? 'Ⅱ'}
-        <small>SEC</small>
-      </span>
+      {seconds === null ? (
+        <span className="countdown-number is-paused">
+          <Pause size={24} />
+          <small>PAUSED</small>
+        </span>
+      ) : (
+        <span className="countdown-number">
+          {seconds}
+          <small>SEC</small>
+        </span>
+      )}
     </div>
   );
 }
@@ -207,5 +217,69 @@ export function Saved({ dirty }: { dirty: boolean }) {
       {dirty ? <span className="status-dot" /> : <Check size={14} />}
       {dirty ? 'Unsaved changes' : 'All changes saved'}
     </span>
+  );
+}
+export function Votes({ votes }: { votes?: Vote[] }) {
+  if (!votes?.length) return null;
+  const total = votes.reduce((sum, v) => sum + v.count, 0);
+  return (
+    <section className="votes" aria-label="How the room voted">
+      <span className="eyebrow">HOW THE ROOM VOTED</span>
+      {votes.map((v) => (
+        <div className={`vote ${v.correct ? 'is-correct' : ''}`} key={v.colleagueId}>
+          <span className="vote-name">
+            {v.correct && <Check size={13} />}
+            {v.name}
+          </span>
+          <span className="vote-bar" aria-hidden="true">
+            <i style={{ width: `${(100 * v.count) / total}%` }} />
+          </span>
+          <strong>{v.count}</strong>
+        </div>
+      ))}
+    </section>
+  );
+}
+/**
+ * Lyrics for the room screen. Nobody can scroll a projector, so the text is
+ * laid out in up to three columns at the largest size that fits the panel.
+ */
+export function FittedLyrics({ text }: { text: string }) {
+  const box = useRef<HTMLDivElement>(null);
+  const [overflowing, setOverflowing] = useState(false);
+  useLayoutEffect(() => {
+    const element = box.current;
+    if (!element) return;
+    function fit() {
+      const el = box.current!;
+      const fits = () =>
+        el.scrollHeight <= el.clientHeight + 1 && el.scrollWidth <= el.clientWidth + 1;
+      for (let size = 34; size >= 15; size--) {
+        for (let columns = 1; columns <= 3; columns++) {
+          el.style.fontSize = `${size}px`;
+          el.style.columnCount = String(columns);
+          if (fits()) {
+            setOverflowing(false);
+            return;
+          }
+        }
+      }
+      setOverflowing(true);
+    }
+    fit();
+    const observer = new ResizeObserver(fit);
+    observer.observe(element);
+    void document.fonts?.ready.then(fit);
+    return () => observer.disconnect();
+  }, [text]);
+  return (
+    <div ref={box} className={`screen-lyrics ${overflowing ? 'is-overflowing' : ''}`}>
+      {text
+        .split(/\n\s*\n/)
+        .filter((stanza) => stanza.trim())
+        .map((stanza, i) => (
+          <p key={i}>{stanza.trim()}</p>
+        ))}
+    </div>
   );
 }

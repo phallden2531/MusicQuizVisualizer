@@ -24,6 +24,8 @@ const fixture = {
 class MemoryStore implements Storage {
   state: AppState | null = null;
   fail = false;
+  writes = 0;
+  deleted: string[] = [];
   beforeWrite?: () => Promise<void>;
   async readState() {
     return structuredClone(this.state);
@@ -31,12 +33,29 @@ class MemoryStore implements Storage {
   async writeState(state: AppState) {
     await this.beforeWrite?.();
     if (this.fail) throw new Error('Storage unavailable');
+    this.writes++;
     this.state = structuredClone(state);
   }
   async putAsset(_info: AssetInfo, _data: Buffer) {}
-  async getAsset(_id: string) {
+  async getAssetInfo(_id: string) {
     return null;
   }
+  async readAsset(_id: string) {
+    return null;
+  }
+  async deleteAsset(id: string) {
+    this.deleted.push(id);
+  }
+}
+async function startedGame(clock: () => number, storage = new MemoryStore()) {
+  const service = await QuizService.open(storage, clock);
+  await service.saveQuiz(fixture);
+  const game = await service.newGame();
+  const player = await service.join(game.roomCode, 'Alice');
+  service.attachScreen('screen');
+  service.markReady('screen', 'song', 60000);
+  await service.command('start', 'start', game.runId);
+  return { service, storage, game, player, runId: service.state.game!.runId };
 }
 describe('serialized game service', () => {
   it('accepts a guess received before the deadline even when earlier writes delay processing', async () => {
@@ -156,5 +175,64 @@ describe('serialized game service', () => {
     expect(recovered.state.game!.elapsedMs).toBe(5000);
     expect(recovered.view('player', player.id).myAnswer?.colleagueId).toBe('sam');
     expect(recovered.view('player', player.id).standings[0].score).toBe(0);
+  });
+  it('keeps playback heartbeats in memory and saves them at most every 10 seconds', async () => {
+    let now = 1000;
+    const { service, storage, runId } = await startedGame(() => now);
+    const changes: unknown[] = [];
+    service.on('change', () => changes.push(1));
+    const before = storage.writes;
+    for (let i = 1; i <= 8; i++) {
+      now = 1000 + i * 1500;
+      await service.playback('screen', 'progress', runId, i * 1500);
+    }
+    expect(service.state.game!.playbackPositionMs).toBe(12000);
+    expect(service.state.game!.heartbeatAt).toBe(13000);
+    expect(storage.writes - before).toBe(1);
+    expect(changes).toHaveLength(0);
+  });
+  it('does not rewrite or republish state when a command changes nothing', async () => {
+    let now = 1000;
+    const { service, storage, game } = await startedGame(() => now);
+    const before = storage.writes;
+    let changes = 0;
+    service.on('change', () => changes++);
+    await service.command('start', 'start', game.runId);
+    expect(storage.writes).toBe(before);
+    expect(changes).toBe(0);
+  });
+  it('pauses a stalled song at its last heartbeat so silence does not count as answering time', async () => {
+    let now = 1000;
+    const { service, runId } = await startedGame(() => now);
+    now = 4000;
+    await service.playback('screen', 'progress', runId, 3000);
+    now = 12500;
+    await service.tick();
+    expect(service.state.game!.paused).toBe(true);
+    expect(service.state.game!.elapsedMs).toBe(3000);
+    expect(service.state.game!.playbackPositionMs).toBe(3000);
+  });
+  it('deletes replaced media after saving but keeps media the live game still needs', async () => {
+    const storage = new MemoryStore();
+    const service = await QuizService.open(storage);
+    await service.saveQuiz(fixture);
+    await service.newGame();
+    const replaced = structuredClone(fixture);
+    replaced.songs[0].audioId = 'audio2';
+    replaced.songs[0].imageId = 'picture2';
+    await service.saveQuiz(replaced);
+    expect(storage.deleted).toEqual([]);
+    const again = structuredClone(replaced);
+    again.songs[0].audioId = 'audio3';
+    await service.saveQuiz(again);
+    expect(storage.deleted).toEqual(['audio2']);
+  });
+  it('removes a player from the lobby at the host’s request', async () => {
+    const service = await QuizService.open(new MemoryStore());
+    await service.saveQuiz(fixture);
+    const game = await service.newGame();
+    const player = await service.join(game.roomCode, 'Alice');
+    await service.removePlayer(player.id);
+    expect(() => service.player(game.roomCode, player.token)).toThrow(/join/i);
   });
 });

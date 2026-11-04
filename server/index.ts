@@ -1,6 +1,6 @@
-import express from 'express';
 import { resolve } from 'node:path';
 import { createApplication } from './app.js';
+import { serveClient } from './client.js';
 import { AzureStorage, LocalStorage } from './storage.js';
 import { QuizService } from './service.js';
 
@@ -21,10 +21,8 @@ const runtime = await createApplication({
   sessionSecret: process.env.SESSION_SECRET || '',
   publicOrigin: process.env.PUBLIC_ORIGIN,
 });
-if (production) {
-  runtime.app.use(express.static(resolve('dist/client'), { maxAge: '1h' }));
-  runtime.app.get(/.*/, (_req, res) => res.sendFile(resolve('dist/client/index.html')));
-} else {
+if (production) serveClient(runtime.app, resolve('dist/client'));
+else {
   const { createServer } = await import('vite');
   const vite = await createServer({
     server: { middlewareMode: true, hmr: { server: runtime.http } },

@@ -1,19 +1,22 @@
-import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
+import { mkdir, open, readFile, rename, rm, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { BlobServiceClient, type ContainerClient } from '@azure/storage-blob';
 import { DefaultAzureCredential } from '@azure/identity';
 import type { AppState, AssetInfo } from '../shared/types.js';
 
-export interface StoredAsset {
-  info: AssetInfo;
-  data: Buffer;
+/** Inclusive byte range within an asset. */
+export interface ByteRange {
+  start: number;
+  end: number;
 }
 export interface Storage {
   readState(): Promise<AppState | null>;
   writeState(state: AppState): Promise<void>;
   putAsset(info: AssetInfo, data: Buffer): Promise<void>;
-  getAsset(id: string): Promise<StoredAsset | null>;
+  getAssetInfo(id: string): Promise<AssetInfo | null>;
+  readAsset(id: string, range?: ByteRange): Promise<Buffer | null>;
+  deleteAsset(id: string): Promise<void>;
 }
 const validId = (id: string) => /^[a-zA-Z0-9_-]{1,80}$/.test(id);
 function isNotFound(error: unknown) {
@@ -47,18 +50,37 @@ export class LocalStorage implements Storage {
     await this.atomic(`${info.id}.bin`, data);
     await this.atomic(`${info.id}.json`, JSON.stringify(info));
   }
-  async getAsset(id: string): Promise<StoredAsset | null> {
+  async getAssetInfo(id: string): Promise<AssetInfo | null> {
     if (!validId(id)) return null;
     try {
-      const [info, data] = await Promise.all([
-        readFile(join(this.directory, `${id}.json`), 'utf8'),
-        readFile(join(this.directory, `${id}.bin`)),
-      ]);
-      return { info: JSON.parse(info), data };
+      return JSON.parse(await readFile(join(this.directory, `${id}.json`), 'utf8'));
     } catch (error) {
       if (isNotFound(error)) return null;
       throw error;
     }
+  }
+  async readAsset(id: string, range?: ByteRange): Promise<Buffer | null> {
+    if (!validId(id)) return null;
+    try {
+      const path = join(this.directory, `${id}.bin`);
+      if (!range) return await readFile(path);
+      const file = await open(path);
+      try {
+        const data = Buffer.alloc(range.end - range.start + 1);
+        const { bytesRead } = await file.read(data, 0, data.length, range.start);
+        return data.subarray(0, bytesRead);
+      } finally {
+        await file.close();
+      }
+    } catch (error) {
+      if (isNotFound(error)) return null;
+      throw error;
+    }
+  }
+  async deleteAsset(id: string) {
+    if (!validId(id)) return;
+    await rm(join(this.directory, `${id}.json`), { force: true });
+    await rm(join(this.directory, `${id}.bin`), { force: true });
   }
 }
 
@@ -116,20 +138,33 @@ export class AzureStorage implements Storage {
       blobHTTPHeaders: { blobContentType: info.contentType },
     });
   }
-  async getAsset(id: string): Promise<StoredAsset | null> {
+  async getAssetInfo(id: string): Promise<AssetInfo | null> {
     if (!validId(id)) return null;
     try {
-      const blob = this.container.getBlockBlobClient(`media/${id}`);
-      const response = await blob.download();
-      const chunks: Buffer[] = [];
-      for await (const chunk of response.readableStreamBody!) chunks.push(Buffer.from(chunk));
-      return {
-        info: JSON.parse(Buffer.from(response.metadata!.info, 'base64').toString()),
-        data: Buffer.concat(chunks),
-      };
+      // Properties carry the metadata without downloading the media itself.
+      const properties = await this.container.getBlockBlobClient(`media/${id}`).getProperties();
+      return JSON.parse(Buffer.from(properties.metadata!.info, 'base64').toString());
     } catch (error) {
       if (isNotFound(error)) return null;
       throw error;
     }
+  }
+  async readAsset(id: string, range?: ByteRange): Promise<Buffer | null> {
+    if (!validId(id)) return null;
+    try {
+      const response = await this.container
+        .getBlockBlobClient(`media/${id}`)
+        .download(range?.start ?? 0, range ? range.end - range.start + 1 : undefined);
+      const chunks: Buffer[] = [];
+      for await (const chunk of response.readableStreamBody!) chunks.push(Buffer.from(chunk));
+      return Buffer.concat(chunks);
+    } catch (error) {
+      if (isNotFound(error)) return null;
+      throw error;
+    }
+  }
+  async deleteAsset(id: string) {
+    if (!validId(id)) return;
+    await this.container.getBlockBlobClient(`media/${id}`).deleteIfExists();
   }
 }

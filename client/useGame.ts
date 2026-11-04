@@ -63,11 +63,13 @@ export function useGame(role: Role, roomCode?: string, token?: string, active = 
   );
   return { state, connected, error, closed, emit, offset };
 }
-export function useNow(offset = 0) {
-  const [now, setNow] = useState(Date.now());
+/** Server-aligned clock. Ticks only while something on screen counts down. */
+export function useNow(offset = 0, ticking = true) {
+  const [, setTick] = useState(0);
   useEffect(() => {
-    const timer = setInterval(() => setNow(Date.now()), 100);
+    if (!ticking) return;
+    const timer = setInterval(() => setTick((t) => t + 1), 100);
     return () => clearInterval(timer);
-  }, []);
-  return now + offset;
+  }, [ticking]);
+  return Date.now() + offset;
 }

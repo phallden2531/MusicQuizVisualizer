@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import type { Game, GameView, Quiz, Role, Standing } from '../shared/types.js';
+import type { Game, GameView, Quiz, Role, Standing, Vote } from '../shared/types.js';
 
 export class RuleError extends Error {
   constructor(
@@ -17,8 +17,12 @@ export function createGame(quiz: Quiz, roomCode: string, now: number): Game {
   requireRule(quiz.colleagues.length > 1, 'Add at least two colleagues first.');
   for (const song of quiz.songs) {
     requireRule(
-      song.audioId && song.imageId && song.durationMs > 0 && song.lyrics.trim(),
-      'Every song needs audio, a picture, and lyrics.',
+      song.title.trim() &&
+        song.audioId &&
+        song.imageId &&
+        song.durationMs > 0 &&
+        song.lyrics.trim(),
+      'Every song needs a title, audio, a picture, and lyrics.',
     );
     requireRule(
       quiz.colleagues.some((c) => c.id === song.correctColleagueId),
@@ -53,6 +57,15 @@ export function joinGame(game: Game, id: string, token: string, name: string) {
     'That nickname is already taken.',
   );
   game.players.push({ id, token, name });
+}
+export function removePlayer(game: Game, id: string) {
+  requireRule(game.phase === 'lobby', 'Players can only be removed in the lobby.');
+  requireRule(
+    game.players.some((p) => p.id === id),
+    'Player not found.',
+    404,
+  );
+  game.players = game.players.filter((p) => p.id !== id);
 }
 export function activeElapsed(game: Game, now: number) {
   const end = game.phase === 'grace' && game.deadline ? Math.min(now, game.deadline) : now;
@@ -163,8 +176,36 @@ export function recover(game: Game, now: number) {
   game.runId = randomUUID();
   advance(game, now);
 }
+export function finishGame(game: Game) {
+  // A round the room never saw revealed must not count or give away its answer.
+  if (!['lobby', 'results', 'finished'].includes(game.phase)) {
+    game.answers.splice(game.roundIndex);
+    game.roundIndex--;
+  }
+  game.phase = 'finished';
+  game.paused = false;
+  game.pauseReason = null;
+  game.clockAt = null;
+  game.deadline = null;
+  game.revealEndsAt = null;
+}
 export function score(correct: boolean, elapsedMs: number, totalMs: number) {
   return correct ? Math.round(1000 - 500 * Math.min(1, Math.max(0, elapsedMs / totalMs))) : 0;
+}
+function votes(game: Game): Vote[] {
+  const song = game.quiz.songs[game.roundIndex];
+  const counts = new Map<string, number>();
+  for (const answer of Object.values(game.answers[game.roundIndex] ?? {}))
+    counts.set(answer.colleagueId, (counts.get(answer.colleagueId) ?? 0) + 1);
+  return game.quiz.colleagues
+    .filter((c) => counts.has(c.id))
+    .map((c) => ({
+      colleagueId: c.id,
+      name: c.name,
+      count: counts.get(c.id)!,
+      correct: c.id === song.correctColleagueId,
+    }))
+    .sort((a, b) => b.count - a.count || Number(b.correct) - Number(a.correct));
 }
 function standings(game: Game): Standing[] {
   const lastVisible = ['results', 'finished'].includes(game.phase)
@@ -214,7 +255,12 @@ export function project(
     pauseReason: game.pauseReason,
     serverNow: now,
     colleagues: game.quiz.colleagues,
-    players: game.players.map((p) => ({ id: p.id, name: p.name, connected: false })),
+    players: game.players.map((p) => ({
+      id: p.id,
+      name: p.name,
+      connected: false,
+      ...(role === 'host' && { answered: Boolean(game.answers[game.roundIndex]?.[p.id]) }),
+    })),
     answerCount: Object.keys(game.answers[game.roundIndex] ?? {}).length,
     standings: standings(game),
     deadline: game.deadline,
@@ -226,6 +272,7 @@ export function project(
   if (song && ['revealing', 'results', 'finished'].includes(game.phase)) {
     view.imageUrl = `/api/games/${game.roomCode}/image`;
   }
+  if (song && game.phase === 'results') view.votes = votes(game);
   if (song && ['results', 'finished'].includes(game.phase)) {
     view.correctName = game.quiz.colleagues.find((c) => c.id === song.correctColleagueId)?.name;
     if (playerId)
@@ -234,8 +281,16 @@ export function project(
         points: view.standings.find((p) => p.id === playerId)?.roundPoints ?? 0,
       };
   }
-  if (role === 'host') view.nextSongTitle = game.quiz.songs[game.roundIndex + 1]?.title;
-  if (role === 'screen') {
+  if (role === 'host') {
+    view.nextSongTitle = game.quiz.songs[game.roundIndex + 1]?.title;
+    if (song && game.phase !== 'finished') {
+      view.currentSongTitle = song.title;
+      view.audioDurationMs = song.durationMs;
+      view.playbackPositionMs = game.playbackPositionMs;
+      view.playbackAt = game.heartbeatAt;
+    }
+  }
+  if (role === 'screen' && game.phase !== 'finished') {
     const audioSong = ['lobby', 'results'].includes(game.phase)
       ? game.quiz.songs[game.roundIndex + 1]
       : song;

@@ -19,18 +19,18 @@ To test on phones, open the host page through the computer’s LAN address (for 
 ## Prepare and run a show
 
 1. In **The lineup**, add every colleague players can choose, one per line. Include misleading names mentioned in the songs.
-2. In **The setlist**, add songs with a private title, lyrics, audio, a picture, and the correct colleague. MP3/M4A files can be up to 30 MB and 30 minutes; JPEG/PNG/WebP pictures up to 10 MB. Save the quiz.
+2. In **The setlist**, add songs with a private title, lyrics, audio, a picture, and the correct colleague. MP3/M4A files can be up to 30 MB and 30 minutes; JPEG/PNG/WebP pictures up to 10 MB. Save the quiz. Unfinished songs can be saved as drafts; a live room needs every song complete.
 3. Create a live room. Open the presentation in a separate tab on the host computer, connect the room’s speakers, and click **Enable room audio**. Only one presentation tab can own playback.
-4. Put the presentation on the projector/TV. Players scan its QR code or enter the room code on the home page, then join with a unique nickname. Maximum 15 players; new players join only in the lobby.
+4. Put the presentation on the projector/TV. Players scan its QR code or enter the room code on the home page, then join with a unique nickname. Maximum 15 players; new players join only in the lobby. The host can remove a player from the lobby (for example, a misspelled nickname) with the × on their name.
 5. Start the first song from the host panel. Phones display full lyrics and the complete colleague roster. Each player locks one guess. The host panel stays private.
-6. When playback finishes, a server-controlled 15-second countdown begins. Answers close automatically. Click **Reveal the colleague** when ready: the picture sharpens over five seconds, then the name and scores appear.
-7. Start the next song or show the final standings. A fresh room uses the current saved quiz; edits never change a game already created.
+6. When playback finishes, a server-controlled 15-second countdown begins. Answers close automatically. Click **Reveal the colleague** when ready: the picture sharpens over five seconds, then the name, how the room voted, and the scores appear. While a song plays, the host panel shows its title, progress, and who has locked a guess, never what they chose.
+7. Start the next song or show the final standings. A fresh room uses the current saved quiz; edits never change a game already created. **End game early** shows the final standings immediately; a song that was not yet revealed does not count.
 
 Correct guesses earn `round(1000 - 500 × min(elapsed / (audio duration + 15 seconds), 1))` points. Wrong or missing guesses earn zero. The server records submission time, excludes paused time, and acknowledges answers only after saving. Equal totals share rank. No correctness or current-round scores are sent to players before the reveal completes.
 
 ## Interruptions
 
-If audio stops, its connection stalls, or the presentation disconnects, the game pauses and stops accepting answers. Reconnect/reload the presentation, enable audio if requested, then click **Resume round** on the host panel. Audio resumes from its last saved position. Refreshing a player’s page preserves identity and a locked guess. Server restarts preserve the game and pause interrupted rounds; no offline time counts toward scoring. Keep the presentation tab active and prevent the computer from sleeping.
+If audio stops, its connection stalls, or the presentation disconnects, the game pauses and stops accepting answers. Reconnect/reload the presentation, enable audio if requested, then click **Resume round** on the host panel. Audio resumes from its last known position; time without audio does not count against answers. Refreshing a player’s page preserves identity and a locked guess. Server restarts preserve the game and pause interrupted rounds; no offline time counts toward scoring. Keep the presentation tab active and prevent the computer from sleeping.
 
 ## Deploy to Azure
 

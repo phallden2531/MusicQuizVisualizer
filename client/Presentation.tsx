@@ -7,17 +7,20 @@ import {
   Countdown,
   Equalizer,
   ErrorNotice,
+  FittedLyrics,
+  leads,
   QR,
   Reveal,
   RoundTag,
   Standings,
+  Votes,
 } from './components';
 import { useGame, useNow } from './useGame';
 
 export function Presentation({ roomCode }: { roomCode: string }) {
   const live = useGame('screen', roomCode);
   const { state, emit, connected } = live;
-  const now = useNow(live.offset);
+  const now = useNow(live.offset, state?.phase === 'grace' || state?.phase === 'revealing');
   const [enabled, setEnabled] = useState(false);
   const [error, setError] = useState('');
   const [loaded, setLoaded] = useState(false);
@@ -26,7 +29,9 @@ export function Presentation({ roomCode }: { roomCode: string }) {
   current.current = state;
   const generation = useRef(0);
   useEffect(() => {
+    // A readiness error about the previous song no longer applies.
     setLoaded(false);
+    setError('');
   }, [state?.audioUrl]);
   async function ready() {
     if (
@@ -126,8 +131,10 @@ export function Presentation({ roomCode }: { roomCode: string }) {
       }).catch(() => {});
   }
   const joinUrl = `${location.origin}/join/${roomCode}`;
+  const inRound = Boolean(state && !['lobby', 'finished'].includes(state.phase));
+  const crowded = (state?.standings.length ?? 0) > 8;
   return (
-    <div className="presentation-shell">
+    <div className={`presentation-shell ${inRound ? 'is-round' : ''}`}>
       <header className="presentation-header">
         <Brand />
         <div className="presentation-meta">
@@ -244,9 +251,7 @@ export function Presentation({ roomCode }: { roomCode: string }) {
               <div className="podium">
                 {state.standings.slice(0, 3).map((p, i) => (
                   <div className={`podium-place podium-${i}`} key={p.id}>
-                    <span>
-                      {p.rank === 1 ? <Trophy size={32} /> : String(p.rank).padStart(2, '0')}
-                    </span>
+                    <span>{leads(p) ? <Trophy size={32} /> : String(p.rank).padStart(2, '0')}</span>
                     <h2>{p.name}</h2>
                     <strong>
                       {p.score.toLocaleString()}
@@ -255,7 +260,7 @@ export function Presentation({ roomCode }: { roomCode: string }) {
                   </div>
                 ))}
               </div>
-              <Standings standings={state.standings} />
+              <Standings standings={state.standings} columns={crowded} />
             </main>
           ) : (
             <main className="screen-round">
@@ -279,7 +284,7 @@ export function Presentation({ roomCode }: { roomCode: string }) {
                       <Music2 size={16} />
                       THE LYRICS
                     </span>
-                    <div className="screen-lyrics">{state.lyrics}</div>
+                    <FittedLyrics text={state.lyrics ?? ''} />
                   </div>
                   <div className="screen-round-bottom">
                     {state.phase === 'grace' ? (
@@ -303,16 +308,19 @@ export function Presentation({ roomCode }: { roomCode: string }) {
                 </>
               ) : (
                 <div
-                  className={`screen-results ${state.phase === 'revealing' ? 'reveal-only' : ''}`}
+                  className={`screen-results ${state.phase === 'revealing' ? 'reveal-only' : ''} ${crowded ? 'is-crowded' : ''}`}
                 >
-                  <Reveal state={state} now={now} />
+                  <div className="screen-reveal-column">
+                    <Reveal state={state} now={now} />
+                    <Votes votes={state.votes} />
+                  </div>
                   {state.phase === 'results' && (
                     <section className="screen-scoreboard">
                       <div className="scoreboard-heading">
                         <span className="eyebrow">THE ROOM SO FAR</span>
                         <h2>On the leaderboard.</h2>
                       </div>
-                      <Standings standings={state.standings} />
+                      <Standings standings={state.standings} columns={crowded} />
                     </section>
                   )}
                 </div>

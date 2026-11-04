@@ -6,7 +6,7 @@ it('rejects malformed and opaque WebSocket origins without crashing the server',
   const script = `
     import { createApplication } from './server/app.ts';
     import { QuizService } from './server/service.ts';
-    const storage = { readState: async()=>null, writeState:async()=>{}, putAsset:async()=>{}, getAsset:async()=>null };
+    const storage = { readState: async()=>null, writeState:async()=>{}, putAsset:async()=>{}, getAssetInfo:async()=>null, readAsset:async()=>null, deleteAsset:async()=>{} };
     const service = await QuizService.open(storage);
     const runtime = await createApplication({ service, hostPassword:'test-password', sessionSecret:'test-session-secret-longer-than-thirty-two-characters', production:false });
     await new Promise(resolve => runtime.http.listen(0,'127.0.0.1',resolve));

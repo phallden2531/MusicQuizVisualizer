@@ -28,6 +28,21 @@ it('atomically persists versioned state and media across adapter instances', asy
   );
   const reopened = new LocalStorage(dir);
   expect(await reopened.readState()).toEqual(state);
-  expect((await reopened.getAsset('test-asset'))?.data.toString()).toBe('abc');
-  expect(await reopened.getAsset('../state')).toBeNull();
+  expect((await reopened.readAsset('test-asset'))?.toString()).toBe('abc');
+  expect((await reopened.getAssetInfo('test-asset'))?.contentType).toBe('image/png');
+  expect(await reopened.readAsset('../state')).toBeNull();
+  expect(await reopened.getAssetInfo('../state')).toBeNull();
+});
+it('reads byte ranges and deletes media', async () => {
+  const dir = await mkdtemp(join(tmpdir(), 'quiz-store-'));
+  dirs.push(dir);
+  const store = new LocalStorage(dir);
+  await store.putAsset(
+    { id: 'clip', kind: 'audio', contentType: 'audio/mpeg', size: 10 },
+    Buffer.from('0123456789'),
+  );
+  expect((await store.readAsset('clip', { start: 2, end: 5 }))?.toString()).toBe('2345');
+  await store.deleteAsset('clip');
+  expect(await store.readAsset('clip')).toBeNull();
+  expect(await store.getAssetInfo('clip')).toBeNull();
 });

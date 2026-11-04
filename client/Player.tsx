@@ -21,6 +21,7 @@ import {
   Reveal,
   RoundTag,
   Standings,
+  Votes,
 } from './components';
 import { useGame, useNow } from './useGame';
 
@@ -42,7 +43,7 @@ export function Player({ roomCode }: { roomCode: string }) {
   const [selected, setSelected] = useState('');
   const live = useGame('player', roomCode, identity?.token, Boolean(identity));
   const state = live.state;
-  const now = useNow(live.offset);
+  const now = useNow(live.offset, state?.phase === 'grace' || state?.phase === 'revealing');
   useEffect(() => {
     setSelected('');
     setSearch('');
@@ -82,7 +83,11 @@ export function Player({ roomCode }: { roomCode: string }) {
     setIdentity(null);
   }
   const answering = state && ['playing', 'grace'].includes(state.phase);
+  const canPick = answering && !state.myAnswer;
+  // In the last call the guess matters more than rereading; fold the lyrics away.
+  const lastCall = canPick && state.phase === 'grace';
   const lockedName = state?.colleagues.find((c) => c.id === state.myAnswer?.colleagueId)?.name;
+  const selectedName = state?.colleagues.find((c) => c.id === selected)?.name;
   return (
     <div className="player-shell">
       <header className="player-header">
@@ -220,7 +225,13 @@ export function Player({ roomCode }: { roomCode: string }) {
               {state.paused && (
                 <div className="notice paused-notice">
                   <strong>A little intermission.</strong>
-                  <span>The host will resume shortly. Your guess is safe.</span>
+                  <span>
+                    {state.myAnswer
+                      ? 'The host will resume shortly. Your guess is safe.'
+                      : answering
+                        ? 'The host will resume shortly. You can still guess after that.'
+                        : 'The host will resume shortly.'}
+                  </span>
                 </div>
               )}
               <Countdown state={state} now={now} />
@@ -234,13 +245,13 @@ export function Player({ roomCode }: { roomCode: string }) {
                       really about?
                     </h1>
                   </div>
-                  <section className="lyrics-card">
-                    <div className="lyrics-label">
+                  <details className="lyrics-card" open={!lastCall} key={String(lastCall)}>
+                    <summary className="lyrics-label">
                       <Music2 size={14} />
-                      THE LYRICS
-                    </div>
+                      {lastCall ? 'SHOW THE LYRICS AGAIN' : 'THE LYRICS'}
+                    </summary>
                     <div className="lyrics-text">{state.lyrics}</div>
-                  </section>
+                  </details>
                   {state.myAnswer ? (
                     <div className="guess-locked">
                       <span className="locked-icon">
@@ -278,6 +289,7 @@ export function Player({ roomCode }: { roomCode: string }) {
                           .map((c) => (
                             <button
                               key={c.id}
+                              aria-pressed={selected === c.id}
                               className={`suspect ${selected === c.id ? 'is-selected' : ''}`}
                               disabled={state.paused || !live.connected}
                               onClick={() => setSelected(c.id)}
@@ -291,18 +303,20 @@ export function Player({ roomCode }: { roomCode: string }) {
                           ))}
                       </div>
                       <ErrorNotice message={error} />
-                      <div className="lock-action">
-                        <button
-                          className="button button-primary button-full"
-                          disabled={!selected || busy || state.paused || !live.connected}
-                          onClick={answer}
-                        >
-                          <LockKeyhole size={16} />
-                          Lock my guess
-                        </button>
-                        <small>One shot per song. Earlier correct guesses earn more.</small>
-                      </div>
                     </section>
+                  )}
+                  {canPick && (
+                    <div className="lock-action">
+                      <button
+                        className="button button-primary button-full"
+                        disabled={!selected || busy || state.paused || !live.connected}
+                        onClick={answer}
+                      >
+                        <LockKeyhole size={16} />
+                        {selectedName ? `Lock in ${selectedName}` : 'Pick a colleague below'}
+                      </button>
+                      <small>One shot per song. Earlier correct guesses earn more.</small>
+                    </div>
                   )}
                   {state.phase === 'locked' && (
                     <div className="waiting-reveal">
@@ -343,6 +357,7 @@ export function Player({ roomCode }: { roomCode: string }) {
                         </div>
                         <b>+{state.myResult?.points ?? 0}</b>
                       </div>
+                      <Votes votes={state.votes} />
                       <div className="player-score-title">
                         <span className="eyebrow">THE ROOM SO FAR</span>
                         <Trophy size={17} />
