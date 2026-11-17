@@ -4,10 +4,13 @@ import {
   Check,
   ImagePlus,
   LoaderCircle,
+  Pause,
+  Play,
   Trash2,
   Upload,
   Volume2,
 } from 'lucide-react';
+import { useRef, useState } from 'react';
 import type { Song } from '../../shared/types';
 import type { QuizEditor } from './useQuizEditor';
 
@@ -30,12 +33,12 @@ export function SongEditor({
   const { quiz, uploading, notice } = editor;
   const update = (patch: Partial<Song>) => editor.updateSong(song.id, patch);
   return (
-    <section className="song-editor panel" key={song.id}>
+    <section className="song-editor sheet" key={song.id}>
       <div className="editor-heading">
-        <div>
-          <span className="eyebrow">TRACK {String(index + 1).padStart(2, '0')}</span>
-          <h2>The details make the mystery.</h2>
-        </div>
+        <h2>
+          <span className="track-no">{String(index + 1).padStart(2, '0')}</span>
+          The details make the mystery.
+        </h2>
         <div className="editor-tools">
           <button
             className="icon-button"
@@ -143,15 +146,7 @@ export function SongEditor({
           {notice}
         </p>
       )}
-      {song.audioId && (
-        <audio
-          className="audio-preview"
-          controls
-          preload="metadata"
-          src={`/api/assets/${song.audioId}`}
-          aria-label="Preview uploaded audio"
-        />
-      )}
+      {song.audioId && <AudioPreview src={`/api/assets/${song.audioId}`} />}
       <label htmlFor="song-lyrics">
         Lyrics <span>SHOWN WHILE THE SONG PLAYS</span>
       </label>
@@ -172,5 +167,62 @@ export function SongEditor({
         <span>Answers close 15 seconds after the song.</span>
       </div>
     </section>
+  );
+}
+
+/** Host-only listening check for the uploaded song, drawn in the studio's own controls. */
+function AudioPreview({ src }: { src: string }) {
+  const audio = useRef<HTMLAudioElement>(null);
+  const [playing, setPlaying] = useState(false);
+  const [position, setPosition] = useState(0);
+  const [duration, setDuration] = useState(0);
+  function toggle() {
+    const element = audio.current;
+    if (!element) return;
+    if (element.paused) void element.play().catch(() => setPlaying(false));
+    else element.pause();
+  }
+  function seek(event: React.PointerEvent<HTMLDivElement>) {
+    const element = audio.current;
+    if (!element || !duration) return;
+    const box = event.currentTarget.getBoundingClientRect();
+    element.currentTime =
+      (Math.min(Math.max(event.clientX - box.left, 0), box.width) / box.width) * duration;
+  }
+  return (
+    <div className="audio-preview">
+      <audio
+        ref={audio}
+        src={src}
+        preload="metadata"
+        onPlay={() => setPlaying(true)}
+        onPause={() => setPlaying(false)}
+        onEnded={() => setPlaying(false)}
+        onTimeUpdate={(e) => setPosition(e.currentTarget.currentTime * 1000)}
+        onLoadedMetadata={(e) => setDuration(e.currentTarget.duration)}
+      />
+      <button
+        type="button"
+        className="icon-button preview-toggle"
+        aria-label={playing ? 'Pause preview' : 'Preview uploaded audio'}
+        onClick={toggle}
+      >
+        {playing ? <Pause size={18} /> : <Play size={18} />}
+      </button>
+      <div
+        className="track-progress"
+        role="progressbar"
+        aria-label="Preview progress"
+        aria-valuemin={0}
+        aria-valuemax={Math.round(duration * 1000)}
+        aria-valuenow={Math.round(position)}
+        onPointerDown={seek}
+      >
+        <i style={{ width: `${duration ? (100 * position) / (duration * 1000) : 0}%` }} />
+      </div>
+      <small>
+        {formatDuration(position)} / {formatDuration(duration * 1000)}
+      </small>
+    </div>
   );
 }

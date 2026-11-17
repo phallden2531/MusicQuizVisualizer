@@ -1,0 +1,559 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-17T12:58:33+00:00",
+  "title": "Design System: Off the Record",
+  "extensions": {
+    "colorMeta": {
+      "sticker-red": {
+        "role": "primary",
+        "displayName": "Sticker Red",
+        "tonalRamp": [
+          "oklch(15% 0.082 28)",
+          "oklch(25% 0.127 28)",
+          "oklch(35% 0.164 28)",
+          "oklch(48% 0.197 28)",
+          "oklch(60% 0.201 28)",
+          "oklch(72% 0.174 28)",
+          "oklch(84% 0.131 28)",
+          "oklch(95% 0.082 28)"
+        ],
+        "canonical": "oklch(56.6% 0.205 28)"
+      },
+      "sticker-red-deep": {
+        "role": "primary",
+        "displayName": "Pressed Sticker Red",
+        "tonalRamp": [
+          "oklch(15% 0.076 28)",
+          "oklch(25% 0.118 28)",
+          "oklch(35% 0.152 28)",
+          "oklch(48% 0.183 28)",
+          "oklch(60% 0.186 28)",
+          "oklch(72% 0.161 28)",
+          "oklch(84% 0.122 28)",
+          "oklch(95% 0.076 28)"
+        ]
+      },
+      "raffle-yellow": {
+        "role": "secondary",
+        "displayName": "Raffle Yellow",
+        "tonalRamp": [
+          "oklch(15% 0.061 89)",
+          "oklch(25% 0.094 89)",
+          "oklch(35% 0.122 89)",
+          "oklch(48% 0.146 89)",
+          "oklch(60% 0.149 89)",
+          "oklch(72% 0.129 89)",
+          "oklch(84% 0.097 89)",
+          "oklch(95% 0.061 89)"
+        ],
+        "canonical": "oklch(85.3% 0.152 89)"
+      },
+      "badge-teal": {
+        "role": "tertiary",
+        "displayName": "Badge Teal",
+        "tonalRamp": [
+          "oklch(15% 0.044 182)",
+          "oklch(25% 0.068 182)",
+          "oklch(35% 0.088 182)",
+          "oklch(48% 0.106 182)",
+          "oklch(60% 0.108 182)",
+          "oklch(72% 0.093 182)",
+          "oklch(84% 0.070 182)",
+          "oklch(95% 0.044 182)"
+        ],
+        "canonical": "oklch(73.9% 0.110 182)"
+      },
+      "badge-teal-deep": {
+        "role": "tertiary",
+        "displayName": "Deep Badge Teal",
+        "tonalRamp": [
+          "oklch(15% 0.036 182)",
+          "oklch(25% 0.056 182)",
+          "oklch(35% 0.072 182)",
+          "oklch(48% 0.087 182)",
+          "oklch(60% 0.088 182)",
+          "oklch(72% 0.076 182)",
+          "oklch(84% 0.058 182)",
+          "oklch(95% 0.036 182)"
+        ]
+      },
+      "badge-pink": {
+        "role": "tertiary",
+        "displayName": "Badge Pink",
+        "tonalRamp": [
+          "oklch(15% 0.045 357)",
+          "oklch(25% 0.070 357)",
+          "oklch(35% 0.090 357)",
+          "oklch(48% 0.108 357)",
+          "oklch(60% 0.110 357)",
+          "oklch(72% 0.095 357)",
+          "oklch(84% 0.072 357)",
+          "oklch(95% 0.045 357)"
+        ],
+        "canonical": "oklch(78.7% 0.112 357)"
+      },
+      "navy-950": {
+        "role": "neutral",
+        "displayName": "Navy Well",
+        "tonalRamp": [
+          "#0d1530",
+          "#111a38",
+          "#17234a",
+          "#1f2d5c",
+          "#2a3b72",
+          "#3a4d8a",
+          "#8591c0",
+          "#aab4d8"
+        ]
+      },
+      "navy-900": {
+        "role": "neutral",
+        "displayName": "Navy Track",
+        "tonalRamp": [
+          "#0d1530",
+          "#111a38",
+          "#17234a",
+          "#1f2d5c",
+          "#2a3b72",
+          "#3a4d8a",
+          "#8591c0",
+          "#aab4d8"
+        ]
+      },
+      "navy": {
+        "role": "neutral",
+        "displayName": "Lanyard Navy",
+        "tonalRamp": [
+          "#0d1530",
+          "#111a38",
+          "#17234a",
+          "#1f2d5c",
+          "#2a3b72",
+          "#3a4d8a",
+          "#8591c0",
+          "#aab4d8"
+        ],
+        "canonical": "oklch(26.9% 0.074 268)"
+      },
+      "navy-700": {
+        "role": "neutral",
+        "displayName": "Navy Raise",
+        "tonalRamp": [
+          "#0d1530",
+          "#111a38",
+          "#17234a",
+          "#1f2d5c",
+          "#2a3b72",
+          "#3a4d8a",
+          "#8591c0",
+          "#aab4d8"
+        ]
+      },
+      "navy-600": {
+        "role": "neutral",
+        "displayName": "Navy Rule",
+        "tonalRamp": [
+          "#0d1530",
+          "#111a38",
+          "#17234a",
+          "#1f2d5c",
+          "#2a3b72",
+          "#3a4d8a",
+          "#8591c0",
+          "#aab4d8"
+        ]
+      },
+      "navy-500": {
+        "role": "neutral",
+        "displayName": "Navy Outline",
+        "tonalRamp": [
+          "#0d1530",
+          "#111a38",
+          "#17234a",
+          "#1f2d5c",
+          "#2a3b72",
+          "#3a4d8a",
+          "#8591c0",
+          "#aab4d8"
+        ]
+      },
+      "paper": {
+        "role": "neutral",
+        "displayName": "Paper",
+        "tonalRamp": [
+          "#14161f",
+          "#5b5850",
+          "#8d877b",
+          "#a39d90",
+          "#b9b2a3",
+          "#d9d1c1",
+          "#f1ece1",
+          "#fbf8f2"
+        ],
+        "canonical": "oklch(98.0% 0.009 85)"
+      },
+      "paper-2": {
+        "role": "neutral",
+        "displayName": "Paper Hover",
+        "tonalRamp": [
+          "oklch(15% 0.008 85)",
+          "oklch(25% 0.012 85)",
+          "oklch(35% 0.016 85)",
+          "oklch(48% 0.019 85)",
+          "oklch(60% 0.020 85)",
+          "oklch(72% 0.017 85)",
+          "oklch(84% 0.013 85)",
+          "oklch(95% 0.008 85)"
+        ]
+      },
+      "paper-line": {
+        "role": "neutral",
+        "displayName": "Paper Line",
+        "tonalRamp": [
+          "oklch(15% 0.010 85)",
+          "oklch(25% 0.016 85)",
+          "oklch(35% 0.020 85)",
+          "oklch(48% 0.024 85)",
+          "oklch(60% 0.024 85)",
+          "oklch(72% 0.021 85)",
+          "oklch(84% 0.016 85)",
+          "oklch(95% 0.010 85)"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "tonalRamp": [
+          "oklch(15% 0.008 275)",
+          "oklch(25% 0.011 275)",
+          "oklch(35% 0.014 275)",
+          "oklch(48% 0.017 275)",
+          "oklch(60% 0.018 275)",
+          "oklch(72% 0.015 275)",
+          "oklch(84% 0.012 275)",
+          "oklch(95% 0.008 275)"
+        ],
+        "canonical": "oklch(20.2% 0.018 275)"
+      },
+      "ink-muted": {
+        "role": "neutral",
+        "displayName": "Ink Muted",
+        "tonalRamp": [
+          "oklch(15% 0.008 85)",
+          "oklch(25% 0.008 85)",
+          "oklch(35% 0.010 85)",
+          "oklch(48% 0.012 85)",
+          "oklch(60% 0.012 85)",
+          "oklch(72% 0.010 85)",
+          "oklch(84% 0.008 85)",
+          "oklch(95% 0.008 85)"
+        ]
+      },
+      "text": {
+        "role": "neutral",
+        "displayName": "Ground Text",
+        "tonalRamp": [
+          "oklch(15% 0.008 85)",
+          "oklch(25% 0.008 85)",
+          "oklch(35% 0.008 85)",
+          "oklch(48% 0.009 85)",
+          "oklch(60% 0.009 85)",
+          "oklch(72% 0.008 85)",
+          "oklch(84% 0.008 85)",
+          "oklch(95% 0.008 85)"
+        ]
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Muted on Navy",
+        "tonalRamp": [
+          "#0d1530",
+          "#111a38",
+          "#17234a",
+          "#1f2d5c",
+          "#2a3b72",
+          "#3a4d8a",
+          "#8591c0",
+          "#aab4d8"
+        ],
+        "canonical": "oklch(77.4% 0.053 273)"
+      },
+      "muted-2": {
+        "role": "neutral",
+        "displayName": "Muted 2 on Navy",
+        "tonalRamp": [
+          "#0d1530",
+          "#111a38",
+          "#17234a",
+          "#1f2d5c",
+          "#2a3b72",
+          "#3a4d8a",
+          "#8591c0",
+          "#aab4d8"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Home and login hero headlines; the projector scales the role larger (lobby, finale)."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Host page headings and the projector song heading."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Sheet headings, phone section headings, reveal captions."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Copy and notices; intros at 1.15rem, max 34em."
+      },
+      "lyrics": {
+        "displayName": "Lyrics",
+        "purpose": "Phone lyrics; the projector fits lyrics into balanced columns at weight 500."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Capitalised column headers, field hints and metric captions only."
+      },
+      "tag-hello": {
+        "displayName": "Tag Hello",
+        "purpose": "The word HELLO on a name tag, sized in em of the tag."
+      },
+      "marker-name": {
+        "displayName": "Marker Name",
+        "purpose": "Every person's name and the brand name; nothing else."
+      },
+      "serial": {
+        "displayName": "Serial",
+        "purpose": "Room codes, countdown digits and score totals, tabular."
+      }
+    },
+    "shadows": [
+      {
+        "name": "object",
+        "value": "0 18px 32px -18px rgb(5 9 26 / 0.85), 0 3px 6px -2px rgb(5 9 26 / 0.35)",
+        "purpose": "Every resting object: tags, tickets, badges, sheets, brand, reveal photo (--shadow-object)."
+      },
+      {
+        "name": "suspect-rest",
+        "value": "0 8px 14px -10px rgb(5 9 26 / 0.9)",
+        "purpose": "Resting suspect badges on the phone."
+      },
+      {
+        "name": "suspect-lifted",
+        "value": "0 0 0 3px #f6c945, 0 22px 26px -14px rgb(5 9 26 / 0.95)",
+        "purpose": "The picked suspect, with a yellow edge."
+      },
+      {
+        "name": "slap-start",
+        "value": "0 50px 60px -24px rgb(5 9 26 / 0.7)",
+        "purpose": "First frame of the slap-on settle."
+      },
+      {
+        "name": "button-red-lift",
+        "value": "0 10px 20px -12px rgb(212 43 37 / 0.9)",
+        "purpose": "Under the primary button only."
+      },
+      {
+        "name": "focus",
+        "value": "outline: 3px solid #f6c945; outline-offset: 3px",
+        "purpose": "Focus-visible on navy; the outline turns ink inside sheets, tickets and name tags."
+      },
+      {
+        "name": "input-focus",
+        "value": "0 0 0 3px rgb(246 201 69 / 0.22)",
+        "purpose": "Input focus ring on navy (0.6 alpha on sheets)."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-out",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Exponential ease-out for all object motion (--ease-out)."
+      },
+      {
+        "name": "slap-on-settle",
+        "value": "@keyframes slap { from { transform: rotate(calc(var(--tilt) - 9deg)) scale(1.35); box-shadow: 0 50px 60px -24px rgb(5 9 26 / 0.7); } to { transform: rotate(var(--tilt)) scale(1); box-shadow: var(--shadow-object); } } 0.6s (name tag) / 0.55s (guest badge), var(--ease-out), both",
+        "purpose": "The single signature settle: a player joining, a guess locking, the true name at the reveal."
+      },
+      {
+        "name": "state-change",
+        "value": "0.18s",
+        "purpose": "Colour, border and background state feedback."
+      },
+      {
+        "name": "suspect-lift",
+        "value": "transform 0.3s var(--ease-out): translateY(-5px) rotate(-2.5deg)",
+        "purpose": "Picking a suspect."
+      },
+      {
+        "name": "button-press",
+        "value": "transform 0.25s var(--ease-out): -1px hover, +1px active",
+        "purpose": "Button feedback."
+      },
+      {
+        "name": "reveal-focus",
+        "value": "blur 24px to 0 linear over 5s, scale 1.08",
+        "purpose": "Reveal photo sharpening with the reveal timer."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "animation: none; transition: none",
+        "purpose": "prefers-reduced-motion removes all motion; objects appear at their final tilt."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "host-single-column",
+        "value": "1100px"
+      },
+      {
+        "name": "stack",
+        "value": "860px"
+      },
+      {
+        "name": "phone",
+        "value": "640px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Name Tag",
+      "kind": "custom",
+      "refersTo": "name-tag",
+      "description": "The HELLO my-name-is sticker; red is always the true answer. Slaps on when something is stuck down.",
+      "html": "<div class=\"ds-tag\" style=\"--tilt:-3deg\"><span class=\"ds-tag-hello\">HELLO</span><span class=\"ds-tag-intro\">my name is</span><div class=\"ds-tag-name\">Sam Okafor</div></div>",
+      "css": ".ds-tag{--tilt:0deg;display:inline-flex;flex-direction:column;align-items:center;min-width:11em;padding:.55em .55em .7em;border-radius:1em;background:#d42b25;color:#fbf8f2;text-align:center;font-size:17px;font-family: 'Bricolage Grotesque Variable','Bricolage Grotesque',system-ui,sans-serif;transform:rotate(var(--tilt));box-shadow: 0 18px 32px -18px rgb(5 9 26 / 0.85), 0 3px 6px -2px rgb(5 9 26 / 0.35);animation:ds-slap .6s cubic-bezier(.16,1,.3,1) both}.ds-tag-hello{font-weight:800;font-size:3em;line-height:.95;letter-spacing:.01em}.ds-tag-intro{font-weight:650;font-size:1.1em;margin:.1em 0 .5em}.ds-tag-name{align-self:stretch;display:flex;align-items:center;justify-content:center;min-height:2em;padding:.25em .45em;border-radius:.2em;background:#fbf8f2;color:#14161f;font-family: 'Permanent Marker',cursive;font-size:2.3em;line-height:1.12}@keyframes ds-slap{from{transform:rotate(calc(var(--tilt) - 9deg)) scale(1.35);box-shadow:0 50px 60px -24px rgb(5 9 26 / .7)}to{transform:rotate(var(--tilt)) scale(1)}}@media (prefers-reduced-motion:reduce){.ds-tag{animation:none}}"
+    },
+    {
+      "name": "Raffle Ticket",
+      "kind": "card",
+      "refersTo": "ticket",
+      "description": "Notched ticket carrying codes and numbers: room code, countdown, personal result.",
+      "html": "<div class=\"ds-ticket\"><strong>Scan to join the room.</strong><div class=\"ds-ticket-serial\">4B0636</div></div>",
+      "css": ".ds-ticket{--notch:13px;display:grid;justify-items:center;gap:10px;padding:22px 34px;border-radius:10px;background:#f6c945;color:#14161f;font-family: 'Bricolage Grotesque Variable','Bricolage Grotesque',system-ui,sans-serif;transform:rotate(2.5deg);-webkit-mask:radial-gradient(circle at 0 50%,#0000 var(--notch),#000 calc(var(--notch) + .5px)) left/51% 100% no-repeat,radial-gradient(circle at 100% 50%,#0000 var(--notch),#000 calc(var(--notch) + .5px)) right/51% 100% no-repeat;mask:radial-gradient(circle at 0 50%,#0000 var(--notch),#000 calc(var(--notch) + .5px)) left/51% 100% no-repeat,radial-gradient(circle at 100% 50%,#0000 var(--notch),#000 calc(var(--notch) + .5px)) right/51% 100% no-repeat}.ds-ticket strong{font-weight:800;font-size:1.3rem;letter-spacing:-.02em}.ds-ticket-serial{width:100%;padding-top:10px;border-top:4px dotted rgb(20 22 31 / .4);text-align:center;font-weight:800;font-size:3rem;letter-spacing:.08em;line-height:1;font-variant-numeric:tabular-nums}"
+    },
+    {
+      "name": "Guest Badge",
+      "kind": "chip",
+      "refersTo": "guest-badge",
+      "description": "A joined player: paper badge with a coloured top band, marker name, slaps on when they join.",
+      "html": "<span class=\"ds-badge\">Karaoke Kim</span><span class=\"ds-badge ds-badge-yellow\">Bassline Bo</span>",
+      "css": ".ds-badge{--band:9px;--tilt:-2deg;display:inline-flex;align-items:center;margin:6px;padding:calc(6px + var(--band)) 12px 7px;border-radius:9px;background:linear-gradient(#48c1b0 0 var(--band),#fbf8f2 0);color:#14161f;font-family: 'Permanent Marker',cursive;font-size:1.1rem;line-height:1.2;transform:rotate(var(--tilt));box-shadow: 0 18px 32px -18px rgb(5 9 26 / 0.85), 0 3px 6px -2px rgb(5 9 26 / 0.35);animation:ds-slap .55s cubic-bezier(.16,1,.3,1) both}.ds-badge-yellow{--tilt:1.5deg;background:linear-gradient(#f6c945 0 var(--band),#fbf8f2 0)}@keyframes ds-slap{from{transform:rotate(calc(var(--tilt) - 9deg)) scale(1.35)}to{transform:rotate(var(--tilt)) scale(1)}}@media (prefers-reduced-motion:reduce){.ds-badge{animation:none}}"
+    },
+    {
+      "name": "Suspect Badge",
+      "kind": "button",
+      "refersTo": "suspect",
+      "description": "The phone's answer choice; picking lifts it with a yellow edge.",
+      "html": "<button class=\"ds-suspect\">Alex Lindqvist</button><button class=\"ds-suspect ds-suspect-teal is-selected\">Sam Okafor</button>",
+      "css": ".ds-suspect{position:relative;overflow:hidden;display:inline-flex;align-items:center;min-width:170px;min-height:66px;margin:6px;padding:28px 12px 11px;border:0;border-radius:11px;background:#fbf8f2;color:#14161f;text-align:left;font-family: 'Permanent Marker',cursive;font-size:1.15rem;line-height:1.2;cursor:pointer;transform:rotate(-.6deg);box-shadow:0 8px 14px -10px rgb(5 9 26 / .9);transition:transform .3s cubic-bezier(.16,1,.3,1),box-shadow .3s cubic-bezier(.16,1,.3,1)}.ds-suspect::before{content:'HELLO';position:absolute;inset:0 0 auto;padding:3px 12px 2px;background:#d42b25;color:#fbf8f2;font-family: 'Bricolage Grotesque Variable','Bricolage Grotesque',system-ui,sans-serif;font-size:.6rem;font-weight:800;letter-spacing:.12em;line-height:1.3}.ds-suspect-teal::before{background:#48c1b0;color:#14161f}.ds-suspect.is-selected,.ds-suspect:hover{transform:translateY(-5px) rotate(-2.5deg);box-shadow:0 0 0 3px #f6c945,0 22px 26px -14px rgb(5 9 26 / .95)}.ds-suspect:focus-visible{outline:3px solid #14161f;outline-offset:3px}"
+    },
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Sticker-red action: join, lock in, start.",
+      "html": "<button class=\"ds-btn-primary\">Lock in Sam Okafor</button>",
+      "css": ".ds-btn-primary{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:50px;padding:0 22px;border:0;border-radius:12px;background:#d42b25;color:#fbf8f2;font-family: 'Bricolage Grotesque Variable','Bricolage Grotesque',system-ui,sans-serif;font-size:1rem;font-weight:750;letter-spacing:-.01em;cursor:pointer;box-shadow:0 10px 20px -12px rgb(212 43 37 / .9);transition:background-color .18s,transform .25s cubic-bezier(.16,1,.3,1)}.ds-btn-primary:hover{background:#b0201b;transform:translateY(-1px)}.ds-btn-primary:active{transform:translateY(1px)}.ds-btn-primary:focus-visible{outline:3px solid #f6c945;outline-offset:3px}"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Outlined secondary action on navy.",
+      "html": "<div class=\"ds-ground\"><button class=\"ds-btn-secondary\">Back to the lobby</button></div>",
+      "css": ".ds-ground{padding:20px;background:#17234a}.ds-btn-secondary{min-height:50px;padding:0 22px;border:0;border-radius:12px;background:none;color:#fbf8f2;font-family: 'Bricolage Grotesque Variable','Bricolage Grotesque',system-ui,sans-serif;font-size:1rem;font-weight:750;cursor:pointer;box-shadow:inset 0 0 0 1.5px #3a4d8a;transition:background-color .18s}.ds-btn-secondary:hover{background:#1f2d5c}.ds-btn-secondary:focus-visible{outline:3px solid #f6c945;outline-offset:3px}"
+    },
+    {
+      "name": "Paper Sheet with Field",
+      "kind": "input",
+      "refersTo": "sheet",
+      "description": "The host's working surface with a field on paper.",
+      "html": "<div class=\"ds-ground\"><form class=\"ds-sheet\"><label class=\"ds-label\" for=\"ds-t\">Song title <span>HOST ONLY</span></label><input id=\"ds-t\" class=\"ds-input\" placeholder=\"The coffee conspiracy\"></form></div>",
+      "css": ".ds-ground{padding:24px;background:#17234a}.ds-sheet{padding:28px;border-radius:20px;background:#fbf8f2;color:#14161f;font-family: 'Bricolage Grotesque Variable','Bricolage Grotesque',system-ui,sans-serif;box-shadow: 0 18px 32px -18px rgb(5 9 26 / 0.85), 0 3px 6px -2px rgb(5 9 26 / 0.35);}.ds-label{display:block;margin:0 0 8px;font-size:.9rem;font-weight:700}.ds-label span{margin-left:6px;font-size:.7rem;font-weight:600;letter-spacing:.08em;color:#5b5850}.ds-input{width:100%;box-sizing:border-box;padding:12px 14px;border:1.5px solid #d9d1c1;border-radius:10px;background:#fff;color:#14161f;font:inherit;font-size:1rem;outline:none;caret-color:#d42b25;transition:border-color .18s,box-shadow .18s}.ds-input::placeholder{color:#8d877b}.ds-input:focus{border-color:#14161f;box-shadow:0 0 0 3px rgb(246 201 69 / .6)}"
+    },
+    {
+      "name": "Host Navigation",
+      "kind": "nav",
+      "refersTo": "nav-tab-active",
+      "description": "Navy track with a paper chip for the active view.",
+      "html": "<div class=\"ds-ground\"><nav class=\"ds-nav\"><button class=\"is-active\">Quiz studio</button><button>Live room</button></nav></div>",
+      "css": ".ds-ground{padding:20px;background:#17234a}.ds-nav{display:inline-flex;gap:4px;padding:4px;border-radius:14px;background:#111a38}.ds-nav button{padding:10px 16px;border:0;border-radius:10px;background:none;color:#aab4d8;font-family: 'Bricolage Grotesque Variable','Bricolage Grotesque',system-ui,sans-serif;font-size:1rem;font-weight:650;cursor:pointer;transition:background-color .18s,color .18s}.ds-nav button:hover{color:#fbf8f2}.ds-nav button.is-active{background:#fbf8f2;color:#14161f}.ds-nav button:focus-visible{outline:3px solid #f6c945;outline-offset:3px}"
+    },
+    {
+      "name": "Status Badge",
+      "kind": "chip",
+      "refersTo": "status-badge",
+      "description": "Navy pill with a live dot.",
+      "html": "<div class=\"ds-ground\"><span class=\"ds-status\"><i></i>LIVE IN THE ROOM</span></div>",
+      "css": ".ds-ground{padding:20px;background:#17234a}.ds-status{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border-radius:999px;background:#1f2d5c;color:#fbf8f2;font-family: 'Bricolage Grotesque Variable','Bricolage Grotesque',system-ui,sans-serif;font-size:.75rem;font-weight:700;letter-spacing:.06em}.ds-status i{width:8px;height:8px;border-radius:50%;background:#48c1b0;box-shadow:0 0 0 3px rgb(72 193 176 / .25)}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Name Tag",
+    "overview": "Every song wears one colleague's name tag; the room has to find whose it really is. The whole client is built from that one object. A lanyard-navy ground fills every viewport, and the only things that sit on it are office-party ephemera: red HELLO my-name-is stickers with names written in marker, perforated raffle tickets in yellow, pink and teal carrying codes and numbers, and small name badges with a coloured top band. The host's working surfaces are paper sheets laid on the same navy. Nothing is a generic card on the room surfaces.\n\nThe world is printed and handled, not lit. Objects are slightly tilted (between about 0.5 and 7 degrees), cast one soft, deep drop shadow, and keep their tactile shapes: rounded sticker corners, notched ticket edges, dotted perforation lines. Two typefaces split the work along the same line as the real objects: Bricolage Grotesque is everything printed on the sticker or ticket, Permanent Marker is only ever a name someone wrote by hand. The density scales with the viewer: the projector is enormous and sparse, read from the back of a dim room; the phone is a quiet single column; the host studio is a normal-density operating surface on paper.\n\nMotion has one signature: the slap-on settle. A tag or badge arrives a little oversized and rotated, then settles onto its tilt with an exponential ease-out while its shadow tightens. The reveal uses it to stick the true name tag onto the photo. Everything else moves only to report state.\n\nThis world replaced an earlier dark game-show stage with a single neon accent; that look is rejected.",
+    "keyCharacteristics": [
+      "Lanyard-navy ground on every viewport, including host screens.",
+      "Objects, not cards: name tags, raffle tickets, top-band badges, paper sheets.",
+      "Marker type for names only; a heavy grotesque for everything printed.",
+      "Slight tilts and one soft object shadow give every object weight.",
+      "One slap-on settle as the signature motion; static under reduced motion."
+    ],
+    "rules": [
+      {
+        "name": "The Ink-On-Light Rule",
+        "body": "Text colour follows the object, not the screen: paper text on red only; ink on paper, yellow, pink and teal. The `tone-*` classes set this pair (`--c`, `--on`) together and must be used together.",
+        "section": "colors"
+      },
+      {
+        "name": "The Inks-Stay-On-Objects Rule",
+        "body": "Red, yellow, pink and teal fill stickers, tickets, badge bands and small marks. They never become a page or section background; the ground is always navy.",
+        "section": "colors"
+      },
+      {
+        "name": "The Marker-Is-A-Name Rule",
+        "body": "Permanent Marker is used for names and nothing else. If the text is not something a person would write on their own sticker, it is set in Bricolage Grotesque.",
+        "section": "typography"
+      },
+      {
+        "name": "The Yellow Second Clause Rule",
+        "body": "A headline may turn its second clause or final punctuation yellow (`em` or `.accent`): \"Do you know the person?\", \"Or do you?\", the period in \"Your quiz studio.\" One yellow phrase per headline, never the whole line.",
+        "section": "typography"
+      },
+      {
+        "name": "The Projector-In-Em Rule",
+        "body": "Inside the presentation shell, size everything in em or viewport units off the shell's clamped base, never in fixed px, so the room view stays one composition at any projector resolution.",
+        "section": "layout"
+      },
+      {
+        "name": "The Same-Table Rule",
+        "body": "All resting objects share one shadow. Lift is a state (picked, arriving), never a hierarchy level.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do put every surface on Lanyard Navy and let the objects carry the colour.",
+      "Do set every person's name in Permanent Marker on paper (or in yellow when it is the viewer's own or the correct one), and everything else in Bricolage Grotesque.",
+      "Do pair tone and text with the `tone-*` classes: paper on red, ink on yellow, pink and teal.",
+      "Do give tags, tickets and badges a small tilt and the single object shadow; keep sheets, inputs and buttons level.",
+      "Do put codes, countdowns and scores on a raffle ticket or in tabular weight-800 numerals.",
+      "Do use the slap-on settle (0.55 to 0.6s, exponential ease-out) when something is stuck down, and only then.",
+      "Do keep the true answer as a red name tag, revealed only at the reveal.",
+      "Do size projector content in em and viewport units off the shell's clamped base."
+    ],
+    "donts": [
+      "Don't return to the dark game-show stage with a single neon accent: no glows, spotlights or neon lime.",
+      "Don't wrap room content (projector and phone) in generic boxed cards; use a name tag, ticket, badge or plain text on navy. Paper sheets belong to the host.",
+      "Don't use Permanent Marker for headings, buttons, labels or copy.",
+      "Don't fill a page or section background with red, yellow, pink or teal.",
+      "Don't add a second entrance animation or a bouncy/elastic ease; the slap-on settle is the only settle.",
+      "Don't give objects different shadow depths at rest to show hierarchy.",
+      "Don't turn a whole headline yellow; at most one clause or the final punctuation."
+    ]
+  }
+}

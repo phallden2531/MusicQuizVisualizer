@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react';
-import { ArrowRight, ArrowUpRight, Headphones, LoaderCircle, Settings2 } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, LoaderCircle } from 'lucide-react';
 import { api, json } from '../api';
-import { Brand, ErrorNotice, Footer, RecordArt } from '../components';
+import { Brand, DecoyArt, ErrorNotice, Footer } from '../components';
 
 export function Login({
   initialError,
@@ -33,9 +33,6 @@ export function Login({
       </header>
       <main className="login-layout">
         <div className="login-copy">
-          <span className="eyebrow">
-            <Headphones size={15} /> BACKSTAGE ACCESS
-          </span>
           <h1>
             Set the mood.
             <br />
@@ -46,12 +43,9 @@ export function Login({
             </em>
           </h1>
           <p className="intro">Your songs. Your colleagues. Their moment of truth.</p>
-          <RecordArt compact />
+          <DecoyArt compact />
         </div>
-        <form className="login-card panel" onSubmit={login}>
-          <span className="mini-icon">
-            <Settings2 size={22} />
-          </span>
+        <form className="login-card sheet" onSubmit={login}>
           <h2>Welcome to the studio.</h2>
           <p className="muted">Sign in to build your setlist and run the show.</p>
           <label htmlFor="host-password">Host password</label>

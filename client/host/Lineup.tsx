@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { Plus, Trash2 } from 'lucide-react';
 import type { Colleague } from '../../shared/types';
+import { tones } from '../components';
 import type { QuizEditor } from './useQuizEditor';
 
 export function Lineup({ editor }: { editor: QuizEditor }) {
@@ -37,8 +38,7 @@ export function Lineup({ editor }: { editor: QuizEditor }) {
   }
   return (
     <section className="roster-layout">
-      <form className="panel roster-add" onSubmit={addNames}>
-        <span className="eyebrow">EVERYONE’S A SUSPECT</span>
+      <form className="sheet roster-add" onSubmit={addNames}>
         <h2>Meet the lineup.</h2>
         <p className="muted">
           Add everyone players can guess. Include the names mentioned in the lyrics to keep things
@@ -57,7 +57,7 @@ export function Lineup({ editor }: { editor: QuizEditor }) {
           Add colleagues
         </button>
       </form>
-      <div className="panel roster-list">
+      <div className="roster-list">
         <div className="sidebar-heading">
           <span>THE USUAL SUSPECTS</span>
           <span>{quiz.colleagues.length} PEOPLE</span>
@@ -66,8 +66,8 @@ export function Lineup({ editor }: { editor: QuizEditor }) {
           <p className="muted">A good mystery needs a few familiar faces.</p>
         ) : (
           quiz.colleagues.map((c, i) => (
-            <div className="colleague-row" key={c.id}>
-              <span className="avatar">{c.name.slice(0, 1).toUpperCase()}</span>
+            <div className={`colleague-row tone-${tones[i % tones.length]}`} key={c.id}>
+              <span className="avatar" aria-hidden="true" />
               <input
                 aria-label={`Colleague ${i + 1} name`}
                 value={c.name}

@@ -1,19 +1,7 @@
 import { useState } from 'react';
-import {
-  ArrowUpRight,
-  Check,
-  ChevronRight,
-  Disc3,
-  Headphones,
-  ListMusic,
-  Music2,
-  Plus,
-  Save,
-  Sparkles,
-  Users,
-} from 'lucide-react';
+import { ArrowUpRight, ChevronRight, Headphones, ListMusic, Plus, Save, Users } from 'lucide-react';
 import type { GameView, Song } from '../../shared/types';
-import { Badge, RecordArt, Saved } from '../components';
+import { Saved } from '../components';
 import { Lineup } from './Lineup';
 import { SongEditor } from './SongEditor';
 import { songReady, type QuizEditor } from './useQuizEditor';
@@ -77,7 +65,6 @@ export function Studio({
     <main className="studio">
       <div className="studio-heading">
         <div>
-          <span className="eyebrow">A LITTLE PREPARATION. A LOT OF SPECULATION.</span>
           <h1>
             Your quiz studio<span className="accent">.</span>
           </h1>
@@ -95,59 +82,6 @@ export function Studio({
             <Save size={16} />
             Save quiz
           </button>
-        </div>
-      </div>
-      <div className="studio-hero">
-        <div className="hero-copy">
-          <Badge>YOUR PRIVATE LISTENING PARTY</Badge>
-          <h2>
-            Familiar faces.
-            <br />
-            <span>Unexpected lyrics.</span>
-          </h2>
-          <p>
-            Every track tells a story.
-            <br />
-            Only one colleague fits the bill.
-          </p>
-          <div className="hero-bottom">
-            <span>
-              <Disc3 size={15} /> ORIGINAL SONGS. ORIGINAL SUSPECTS.
-            </span>
-            <span>VOL. 01</span>
-          </div>
-        </div>
-        <RecordArt />
-      </div>
-      <div className="studio-stats">
-        <div>
-          <span className="stat-icon">
-            <Music2 size={19} />
-          </span>
-          <strong>{String(quiz.songs.length).padStart(2, '0')}</strong>
-          <span>tracks on the setlist</span>
-        </div>
-        <div>
-          <span className="stat-icon">
-            <Users size={19} />
-          </span>
-          <strong>{String(quiz.colleagues.length).padStart(2, '0')}</strong>
-          <span>possible suspects</span>
-        </div>
-        <div>
-          <span className="stat-icon">
-            <Check size={19} />
-          </span>
-          <strong>{String(readyCount).padStart(2, '0')}</strong>
-          <span>tracks ready to play</span>
-        </div>
-        <div className="stats-note">
-          <Sparkles size={16} />
-          <span>
-            A familiar name in the song
-            <br />
-            doesn’t mean it’s about them.
-          </span>
         </div>
       </div>
       <div className="studio-toolbar">
@@ -178,7 +112,7 @@ export function Studio({
       {setupTip && <p className="setup-tip">{setupTip}</p>}
       {section === 'songs' ? (
         <div className="setlist-layout">
-          <aside className="setlist-sidebar panel">
+          <aside className="setlist-sidebar">
             <div className="sidebar-heading">
               <span>RUNNING ORDER</span>
               <span>{quiz.songs.length} TRACKS</span>
@@ -232,11 +166,7 @@ export function Studio({
               onDelete={() => deleteSong(song)}
             />
           ) : (
-            <section className="empty-setlist panel">
-              <span className="empty-disc">
-                <Disc3 size={52} strokeWidth={1} />
-              </span>
-              <span className="eyebrow">THE FIRST TRACK IS ALWAYS SPECIAL</span>
+            <section className="empty-setlist sheet">
               <h2>
                 No tracks on the record.
                 <br />

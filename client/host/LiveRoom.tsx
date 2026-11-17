@@ -8,14 +8,13 @@ import {
   Monitor,
   Pause,
   Play,
-  Radio,
   Sparkles,
   Users,
   X,
 } from 'lucide-react';
 import type { GameView } from '../../shared/types';
 import { api } from '../api';
-import { Badge, Countdown, QR, Standings, Votes } from '../components';
+import { Badge, Countdown, QR, Standings, Ticket, tones, Votes } from '../components';
 
 const clock = (ms: number) =>
   `${Math.floor(ms / 60000)}:${String(Math.floor(ms / 1000) % 60).padStart(2, '0')}`;
@@ -62,12 +61,11 @@ export function LiveRoom({
     <main className="live-host">
       <div className="studio-heading">
         <div>
-          <span className="eyebrow">YOU’RE IN CONTROL</span>
           <h1>
             {game.phase === 'lobby'
               ? 'The room is yours'
               : game.phase === 'finished'
-                ? 'What a good night.'
+                ? 'What a good night'
                 : 'Keep the room guessing'}
             <span className="accent">.</span>
           </h1>
@@ -80,22 +78,19 @@ export function LiveRoom({
         <Badge live={connected}>{connected ? 'LIVE CONNECTION' : 'RECONNECTING'}</Badge>
       </div>
       <div className="live-grid">
-        <section className="panel control-panel">
+        <section className="control-panel sheet">
           <div className="panel-title">
-            <span>
-              <Radio size={16} />
-              SHOW CONTROLS
-            </span>
+            {inRound ? (
+              <span className="round-tag">
+                Song <strong>{String(game.roundIndex + 1).padStart(2, '0')}</strong>
+                <span>of {String(game.totalRounds).padStart(2, '0')}</span>
+              </span>
+            ) : (
+              <span />
+            )}
             <span className="muted">ROOM {game.roomCode}</span>
           </div>
           <div className="host-status">
-            <span className="eyebrow">
-              {game.phase === 'lobby'
-                ? 'BEFORE THE FIRST NOTE'
-                : game.phase === 'finished'
-                  ? 'THE FINAL STANDINGS'
-                  : `TRACK ${game.roundIndex + 1} OF ${game.totalRounds}`}
-            </span>
             <h2>
               {game.paused
                 ? 'Taking a breather.'
@@ -126,10 +121,7 @@ export function LiveRoom({
             ) : null}
             {inRound && game.currentSongTitle && (
               <div className="now-track">
-                <div>
-                  <span>NOW ON THE RECORD</span>
-                  <strong>{game.currentSongTitle}</strong>
-                </div>
+                <strong>{game.currentSongTitle}</strong>
                 <div
                   className="track-progress"
                   role="progressbar"
@@ -273,7 +265,7 @@ export function LiveRoom({
             </button>
           )}
         </section>
-        <section className="panel host-invite">
+        <section className="host-invite">
           <div className="panel-title">
             <span>
               <Users size={16} />
@@ -285,10 +277,10 @@ export function LiveRoom({
           </div>
           {game.phase === 'lobby' ? (
             <>
-              <div className="invite-row">
+              <Ticket className="invite-row">
                 <QR value={joinUrl} />
                 <div>
-                  <span className="eyebrow">SCAN. JOIN. START SPECULATING.</span>
+                  <span className="room-code-label">Room code</span>
                   <strong className="room-code">{game.roomCode}</strong>
                   <button
                     className="text-button"
@@ -304,11 +296,14 @@ export function LiveRoom({
                     Copy invite link <ArrowUpRight size={13} />
                   </button>
                 </div>
-              </div>
+              </Ticket>
               {copied && <p className="upload-success">Invite link copied</p>}
               <div className="player-chips">
-                {game.players.map((p) => (
-                  <span key={p.id} className={p.connected ? 'connected' : ''}>
+                {game.players.map((p, i) => (
+                  <span
+                    key={p.id}
+                    className={`guest-badge tone-${tones[i % tones.length]} ${p.connected ? 'connected' : ''}`}
+                  >
                     <span className="status-dot" />
                     {p.name}
                     <button

@@ -12,15 +12,18 @@ import {
 } from 'lucide-react';
 import { api, json } from './api';
 import {
-  Badge,
   Brand,
   ConnectionNotice,
   Countdown,
   Equalizer,
   ErrorNotice,
+  NameTag,
+  Podium,
   Reveal,
   RoundTag,
   Standings,
+  Ticket,
+  tones,
   Votes,
 } from './components';
 import { useGame, useNow } from './useGame';
@@ -98,31 +101,29 @@ export function Player({ roomCode }: { roomCode: string }) {
       </header>
       {!identity ? (
         <main className="player-join">
-          <span className="ticket-icon">
-            <Headphones size={32} />
-          </span>
-          <span className="eyebrow">YOUR NAME’S ON THE LIST</span>
           <h1>
             Good ears.
             <br />
             <em>Better instincts.</em>
           </h1>
           <p className="muted">
-            Listen to the song, read between the lines,
-            <br />
-            and find the colleague behind the lyrics.
+            Listen to the song, read between the lines, and find the colleague behind the lyrics.
           </p>
           <form onSubmit={join}>
-            <label htmlFor="nickname">Your nickname</label>
-            <input
-              id="nickname"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="What should we call you?"
-              maxLength={30}
-              autoComplete="nickname"
-              required
-            />
+            <label htmlFor="nickname" className="sr-only">
+              Your nickname
+            </label>
+            <NameTag tone="red" size="lg" tilt={-2} className="join-tag">
+              <input
+                id="nickname"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Write your nickname"
+                maxLength={30}
+                autoComplete="nickname"
+                required
+              />
+            </NameTag>
             <ErrorNotice message={error} />
             <button className="button button-primary button-full" disabled={busy || !name.trim()}>
               Join the room <ArrowRight size={18} />
@@ -154,19 +155,16 @@ export function Player({ roomCode }: { roomCode: string }) {
             </div>
           ) : state.phase === 'lobby' ? (
             <main className="player-lobby">
-              <Badge live>YOU’RE IN</Badge>
-              <div className="lobby-record">
-                <Music2 size={42} />
-              </div>
+              <NameTag tone="red" size="lg" tilt={-3} slap className="lobby-tag">
+                {identity.name}
+              </NameTag>
               <h1>
                 You’re on the
                 <br />
                 guest list<span className="accent">.</span>
               </h1>
               <p className="muted">
-                Hey {identity.name}. Get comfortable.
-                <br />
-                The host will drop the first track soon.
+                Hey {identity.name}. Get comfortable. The host will drop the first track soon.
               </p>
               <div className="lobby-info">
                 <span>
@@ -175,38 +173,27 @@ export function Player({ roomCode }: { roomCode: string }) {
                 </span>
                 <span>
                   <Music2 size={17} />
-                  {state.totalRounds} mystery tracks
+                  {state.totalRounds} mystery {state.totalRounds === 1 ? 'track' : 'tracks'}
                 </span>
               </div>
-              <div className="how-to">
-                <span className="eyebrow">HERE’S THE TWIST</span>
-                <p>
-                  The name in the song is a red herring.
-                  <br />
-                  The lyrics describe someone else.
-                </p>
-                <div>
-                  <span>01</span>Listen & read the lyrics
-                </div>
-                <div>
-                  <span>02</span>Choose the real colleague
-                </div>
-                <div>
-                  <span>03</span>Lock your guess. Earlier earns more.
-                </div>
-              </div>
-              <div className="player-identity">
-                <CheckCircle2 size={16} />
-                Playing as <strong>{identity.name}</strong>
-              </div>
+              <section className="how-to" aria-labelledby="twist-heading">
+                <h2 id="twist-heading">Here’s the twist</h2>
+                <p>The name in the song is a red herring. The lyrics describe someone else.</p>
+                <ol>
+                  <li>Listen & read the lyrics</li>
+                  <li>Choose the real colleague</li>
+                  <li>Lock your guess. Earlier earns more.</li>
+                </ol>
+              </section>
             </main>
           ) : state.phase === 'finished' ? (
             <main className="player-finale">
-              <Trophy size={40} className="accent" />
-              <span className="eyebrow">THE FINAL STANDINGS</span>
               <h1>That’s a wrap.</h1>
               <p className="muted">Good songs. Great company. A few surprises.</p>
-              <Standings standings={state.standings} playerId={identity.id} />
+              <Podium standings={state.standings} playerId={identity.id} />
+              {state.standings.length > 3 && (
+                <Standings standings={state.standings.slice(3)} playerId={identity.id} />
+              )}
               <a className="button button-secondary button-full" href="/">
                 Back to the record shop <ArrowRight size={16} />
               </a>
@@ -238,7 +225,6 @@ export function Player({ roomCode }: { roomCode: string }) {
               {answering || state.phase === 'locked' ? (
                 <>
                   <div className="player-round-heading">
-                    <span className="eyebrow">A FAMILIAR NAME. A DIFFERENT PERSON.</span>
                     <h1>
                       Who’s this
                       <br />
@@ -254,14 +240,15 @@ export function Player({ roomCode }: { roomCode: string }) {
                   </details>
                   {state.myAnswer ? (
                     <div className="guess-locked">
-                      <span className="locked-icon">
-                        <Check size={22} />
-                      </span>
-                      <div>
-                        <strong>Your guess is locked</strong>
+                      <NameTag tone="red" size="sm" tilt={-4} slap>
+                        {lockedName}
+                      </NameTag>
+                      <div className="locked-text">
+                        <strong>
+                          <LockKeyhole size={16} /> Your guess is locked
+                        </strong>
                         <span>{lockedName} is on your record.</span>
                       </div>
-                      <LockKeyhole size={17} />
                     </div>
                   ) : state.phase === 'locked' ? (
                     <div className="notice">
@@ -290,15 +277,12 @@ export function Player({ roomCode }: { roomCode: string }) {
                             <button
                               key={c.id}
                               aria-pressed={selected === c.id}
-                              className={`suspect ${selected === c.id ? 'is-selected' : ''}`}
+                              className={`suspect tone-${tones[state.colleagues.indexOf(c) % tones.length]} ${selected === c.id ? 'is-selected' : ''}`}
                               disabled={state.paused || !live.connected}
                               onClick={() => setSelected(c.id)}
                             >
-                              <span className="suspect-initial" aria-hidden="true">
-                                {c.name.slice(0, 1)}
-                              </span>
                               <span>{c.name}</span>
-                              {selected === c.id && <Check size={16} />}
+                              {selected === c.id && <Check size={18} strokeWidth={3} />}
                             </button>
                           ))}
                       </div>
@@ -320,7 +304,6 @@ export function Player({ roomCode }: { roomCode: string }) {
                   )}
                   {state.phase === 'locked' && (
                     <div className="waiting-reveal">
-                      <span className="eyebrow">ALL GUESSES ARE IN</span>
                       <h2>Waiting for the big reveal</h2>
                       <p className="muted">The host has one more secret to share.</p>
                     </div>
@@ -331,7 +314,8 @@ export function Player({ roomCode }: { roomCode: string }) {
                   <Reveal state={state} now={now} />
                   {state.phase === 'results' && (
                     <>
-                      <div
+                      <Ticket
+                        tone={state.myResult?.correct ? 'yellow' : 'pink'}
                         className={`personal-result ${state.myResult?.correct ? 'is-correct' : ''}`}
                       >
                         <span>
@@ -356,12 +340,11 @@ export function Player({ roomCode }: { roomCode: string }) {
                           </small>
                         </div>
                         <b>+{state.myResult?.points ?? 0}</b>
-                      </div>
+                      </Ticket>
                       <Votes votes={state.votes} />
-                      <div className="player-score-title">
-                        <span className="eyebrow">THE ROOM SO FAR</span>
-                        <Trophy size={17} />
-                      </div>
+                      <h3 className="player-score-title">
+                        <Trophy size={17} /> The room so far
+                      </h3>
                       <Standings standings={state.standings} playerId={identity.id} />
                       <p className="next-song-note">The host will take it from here.</p>
                     </>

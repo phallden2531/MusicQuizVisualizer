@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { ArrowUpRight, Expand, Headphones, Music2, Trophy, Users, Volume2 } from 'lucide-react';
+import { ArrowUpRight, Expand, Music2, Users, Volume2 } from 'lucide-react';
 import {
   Badge,
   Brand,
@@ -8,11 +8,14 @@ import {
   Equalizer,
   ErrorNotice,
   FittedLyrics,
-  leads,
+  NameTag,
+  Podium,
   QR,
   Reveal,
   RoundTag,
   Standings,
+  Ticket,
+  tones,
   Votes,
 } from './components';
 import { useGame, useNow } from './useGame';
@@ -136,7 +139,7 @@ export function Presentation({ roomCode }: { roomCode: string }) {
   return (
     <div className={`presentation-shell ${inRound ? 'is-round' : ''}`}>
       <header className="presentation-header">
-        <Brand />
+        {state?.phase === 'lobby' ? <span /> : <Brand />}
         <div className="presentation-meta">
           <Badge live={connected}>{connected ? 'LIVE IN THE ROOM' : 'CONNECTING'}</Badge>
           <button
@@ -199,68 +202,56 @@ export function Presentation({ roomCode }: { roomCode: string }) {
           {state.phase === 'lobby' ? (
             <main className="screen-lobby">
               <div className="screen-lobby-copy">
-                <span className="eyebrow">
-                  <Headphones size={18} /> A LISTENING PARTY WITH A TWIST
-                </span>
+                <NameTag tone="red" size="xl" tilt={-3} className="lobby-hello">
+                  Off the Record
+                </NameTag>
                 <h1>
-                  You know
-                  <br />
-                  these people.
-                  <br />
-                  <em>Or do you?</em>
+                  You know these people. <em>Or do you?</em>
                 </h1>
-                <p>
-                  Listen closely. Read between the lyrics.
-                  <br />
-                  Find the colleague behind the song.
-                </p>
-                <div className="screen-lobby-stats">
-                  <span>
-                    <Music2 size={19} />
-                    {state.totalRounds} mystery tracks
-                  </span>
-                  <span>
-                    <Users size={19} />
-                    {state.players.length} / 15 detectives
-                  </span>
-                </div>
-                <div className="screen-guest-list">
-                  {state.players.map((p) => (
-                    <span key={p.id}>{p.name}</span>
-                  ))}
-                </div>
+                <p>Listen closely. Read between the lyrics. Find the colleague behind the song.</p>
               </div>
-              <div className="screen-invite">
-                <span className="eyebrow">YOUR PHONE IS YOUR BACKSTAGE PASS</span>
-                <QR value={joinUrl} />
+              <Ticket className="screen-invite">
                 <h2>Scan to join the room.</h2>
-                <p className="muted">
+                <QR value={joinUrl} />
+                <p>
                   Or head to <strong>{location.host}</strong> and enter
                 </p>
                 <strong className="screen-room-code">{roomCode}</strong>
                 <span className="screen-invite-note">No app. No account. Just a good hunch.</span>
+              </Ticket>
+              <div className="screen-guests">
+                <div className="screen-lobby-stats">
+                  <span>
+                    <Users size={22} />
+                    {state.players.length} / 15 detectives
+                  </span>
+                  <span>
+                    <Music2 size={22} />
+                    {state.totalRounds} mystery {state.totalRounds === 1 ? 'track' : 'tracks'}
+                  </span>
+                </div>
+                <div className="screen-guest-list">
+                  {state.players.map((p, i) => (
+                    <span key={p.id} className={`guest-badge tone-${tones[i % tones.length]}`}>
+                      {p.name}
+                    </span>
+                  ))}
+                  {state.players.length === 0 && (
+                    <span className="guest-empty">The first badge goes here.</span>
+                  )}
+                </div>
               </div>
             </main>
           ) : state.phase === 'finished' ? (
             <main className="screen-finale">
-              <span className="eyebrow">THE FINAL PRESSING</span>
               <h1>
                 That’s a wrap<span className="accent">.</span>
               </h1>
               <p className="muted">A round of applause for the sharpest ears in the room.</p>
-              <div className="podium">
-                {state.standings.slice(0, 3).map((p, i) => (
-                  <div className={`podium-place podium-${i}`} key={p.id}>
-                    <span>{leads(p) ? <Trophy size={32} /> : String(p.rank).padStart(2, '0')}</span>
-                    <h2>{p.name}</h2>
-                    <strong>
-                      {p.score.toLocaleString()}
-                      <small>POINTS</small>
-                    </strong>
-                  </div>
-                ))}
-              </div>
-              <Standings standings={state.standings} columns={crowded} />
+              <Podium standings={state.standings} />
+              {state.standings.length > 3 && (
+                <Standings standings={state.standings.slice(3)} columns={crowded} />
+              )}
             </main>
           ) : (
             <main className="screen-round">
@@ -273,17 +264,13 @@ export function Presentation({ roomCode }: { roomCode: string }) {
               {['playing', 'grace', 'locked'].includes(state.phase) ? (
                 <>
                   <div className="screen-song-heading">
-                    <div>
-                      <span className="eyebrow">A FAMILIAR NAME. A DIFFERENT STORY.</span>
-                      <h1>Who’s this really about?</h1>
-                    </div>
+                    <NameTag tone="red" size="sm" tilt={-5} className="mystery-tag">
+                      <span aria-hidden="true">?</span>
+                    </NameTag>
+                    <h1>Who’s this really about?</h1>
                     {state.phase === 'playing' && !state.paused && <Equalizer large />}
                   </div>
                   <div className="screen-lyrics-panel">
-                    <span className="lyrics-label">
-                      <Music2 size={16} />
-                      THE LYRICS
-                    </span>
                     <FittedLyrics text={state.lyrics ?? ''} />
                   </div>
                   <div className="screen-round-bottom">
@@ -291,7 +278,6 @@ export function Presentation({ roomCode }: { roomCode: string }) {
                       <Countdown state={state} now={now} />
                     ) : state.phase === 'locked' ? (
                       <div className="screen-locked">
-                        <span className="eyebrow">THE GUESSES ARE IN</span>
                         <h2>Some secrets are worth waiting for.</h2>
                         <p className="muted">Your host will reveal the colleague.</p>
                       </div>
@@ -316,10 +302,7 @@ export function Presentation({ roomCode }: { roomCode: string }) {
                   </div>
                   {state.phase === 'results' && (
                     <section className="screen-scoreboard">
-                      <div className="scoreboard-heading">
-                        <span className="eyebrow">THE ROOM SO FAR</span>
-                        <h2>On the leaderboard.</h2>
-                      </div>
+                      <h2 className="scoreboard-heading">On the leaderboard.</h2>
                       <Standings standings={state.standings} columns={crowded} />
                     </section>
                   )}
@@ -331,10 +314,7 @@ export function Presentation({ roomCode }: { roomCode: string }) {
       )}
       <footer className="presentation-footer">
         <span>ORIGINAL SONGS. FAMILIAR FACES.</span>
-        <span>
-          OFF THE RECORD <span className="accent">/</span>{' '}
-          {state?.title || 'THE COLLEAGUE MUSIC QUIZ'}
-        </span>
+        <span>{state?.title || 'The colleague music quiz'}</span>
       </footer>
     </div>
   );

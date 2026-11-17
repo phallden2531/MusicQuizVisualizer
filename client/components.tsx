@@ -1,22 +1,72 @@
-import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
-import { ArrowUpRight, AudioLines, Check, Disc3, Pause, Trophy, WifiOff } from 'lucide-react';
+import {
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type ReactNode,
+} from 'react';
+import { Check, Pause, Trophy, WifiOff } from 'lucide-react';
 import QRCode from 'qrcode';
 import type { GameView, Standing, Vote } from '../shared/types';
 
 export function Brand({ small = false }: { small?: boolean }) {
   return (
-    <a className={`brand ${small ? 'brand-small' : ''}`} href="/">
-      <span className="brand-symbol">
-        <AudioLines size={23} strokeWidth={2.3} />
+    <a className={`brand ${small ? 'brand-small' : ''}`} href="/" aria-label="Off the Record, home">
+      <span className="brand-hello" aria-hidden="true">
+        HELLO
       </span>
-      <span>
-        OFF THE
-        <br />
-        <strong>RECORD</strong>
-        <i>THE COLLEAGUE MUSIC QUIZ</i>
+      <span className="brand-name" aria-hidden="true">
+        Off the Record
       </span>
     </a>
   );
+}
+export type Tone = 'red' | 'yellow' | 'pink' | 'teal';
+export const tones: Tone[] = ['red', 'teal', 'yellow', 'pink'];
+/** The HELLO my-name-is sticker: the product's one recurring object. */
+export function NameTag({
+  children,
+  tone = 'red',
+  size = 'md',
+  tilt = 0,
+  className = '',
+  slap = false,
+}: {
+  children: ReactNode;
+  tone?: Tone;
+  size?: 'sm' | 'md' | 'lg' | 'xl';
+  tilt?: number;
+  className?: string;
+  /** Plays the slap-on settle when the tag first appears. */
+  slap?: boolean;
+}) {
+  return (
+    <div
+      className={`name-tag tone-${tone} tag-${size} ${slap ? 'is-slapped' : ''} ${className}`}
+      style={{ '--tilt': `${tilt}deg` } as CSSProperties}
+    >
+      <span className="tag-hello" aria-hidden="true">
+        HELLO
+      </span>
+      <span className="tag-intro" aria-hidden="true">
+        my name is
+      </span>
+      <div className="tag-name">{children}</div>
+    </div>
+  );
+}
+/** A perforated raffle ticket. */
+export function Ticket({
+  children,
+  tone = 'yellow',
+  className = '',
+}: {
+  children: ReactNode;
+  tone?: Tone;
+  className?: string;
+}) {
+  return <div className={`ticket tone-${tone} ${className}`}>{children}</div>;
 }
 export function Badge({ children, live = false }: { children: ReactNode; live?: boolean }) {
   return (
@@ -53,26 +103,16 @@ export function Equalizer({ large = false }: { large?: boolean }) {
     </span>
   );
 }
-export function RecordArt({ compact = false }: { compact?: boolean }) {
+/** The game in one picture: a tag that names one person and means another. */
+export function DecoyArt({ compact = false }: { compact?: boolean }) {
   return (
-    <div className={`record-art ${compact ? 'record-compact' : ''}`} aria-hidden="true">
-      <div className="record-sleeve">
-        <span>VOL. 01</span>
-        <AudioLines size={50} />
-        <small>
-          FAMILIAR FACES.
-          <br />
-          UNEXPECTED LYRICS.
-        </small>
-      </div>
-      <div className="vinyl">
-        <div className="vinyl-label">
-          <AudioLines size={22} />
-          <span>OFF THE RECORD</span>
-          <i />
-        </div>
-      </div>
-      <span className="record-spark">✳</span>
+    <div className={`decoy-art ${compact ? 'decoy-compact' : ''}`} aria-hidden="true">
+      <NameTag tone="teal" size="lg" tilt={-7} className="decoy-false">
+        <span className="struck">Alex</span>
+      </NameTag>
+      <NameTag tone="red" size="lg" tilt={5} className="decoy-true">
+        ?
+      </NameTag>
     </div>
   );
 }
@@ -83,7 +123,7 @@ export function QR({ value }: { value: string }) {
     QRCode.toDataURL(value, {
       width: 360,
       margin: 2,
-      color: { dark: '#151813', light: '#ffffff' },
+      color: { dark: '#14161f', light: '#fbf8f2' },
     }).then((data) => {
       if (active) setUrl(data);
     });
@@ -134,14 +174,39 @@ export function Standings({
     </div>
   );
 }
+/** The top three as name tags, winner in the middle (or on top on a phone). */
+export function Podium({ standings, playerId }: { standings: Standing[]; playerId?: string }) {
+  return (
+    <div className="podium">
+      {standings.slice(0, 3).map((p, i) => (
+        <div className={`podium-place podium-${i}`} key={p.id}>
+          <span className="podium-rank">
+            {leads(p) ? <Trophy size={34} /> : String(p.rank).padStart(2, '0')}
+          </span>
+          <NameTag
+            tone={(['red', 'teal', 'yellow'] as const)[i]}
+            size={i === 0 ? 'lg' : 'md'}
+            tilt={[-3, 4, -5][i]}
+            slap
+          >
+            <h2>{p.name}</h2>
+          </NameTag>
+          <strong>
+            {p.score.toLocaleString()}
+            <small>POINTS{p.id === playerId && ' · YOU'}</small>
+          </strong>
+        </div>
+      ))}
+    </div>
+  );
+}
 /** A trophy means something only once somebody has actually scored. */
 export const leads = (p: Standing) => p.rank === 1 && p.score > 0;
 export function RoundTag({ state }: { state: GameView }) {
   return (
     <span className="round-tag">
-      <Disc3 size={15} />
-      TRACK {String(state.roundIndex + 1).padStart(2, '0')}{' '}
-      <span>/ {String(state.totalRounds).padStart(2, '0')}</span>
+      Song <strong>{String(state.roundIndex + 1).padStart(2, '0')}</strong>
+      <span>of {String(state.totalRounds).padStart(2, '0')}</span>
     </span>
   );
 }
@@ -149,21 +214,21 @@ export function Countdown({ state, now }: { state: GameView; now: number }) {
   if (state.phase !== 'grace') return null;
   const seconds = state.deadline ? Math.max(0, Math.ceil((state.deadline - now) / 1000)) : null;
   return (
-    <div className="last-call">
+    <div className="last-call" role="timer">
       <div>
-        <span className="eyebrow">THE MUSIC HAS STOPPED</span>
         <strong>Last call for guesses</strong>
+        <span>The music has stopped.</span>
       </div>
       {seconds === null ? (
-        <span className="countdown-number is-paused">
-          <Pause size={24} />
+        <Ticket className="countdown-number is-paused">
+          <Pause size={26} />
           <small>PAUSED</small>
-        </span>
+        </Ticket>
       ) : (
-        <span className="countdown-number">
+        <Ticket className="countdown-number">
           {seconds}
           <small>SEC</small>
-        </span>
+        </Ticket>
       )}
     </div>
   );
@@ -172,7 +237,7 @@ export function Reveal({ state, now }: { state: GameView; now: number }) {
   const revealing = state.phase === 'revealing';
   const remaining = Math.max(0, (state.revealEndsAt ?? now) - now);
   return (
-    <div className={`reveal ${revealing ? 'is-revealing' : ''}`}>
+    <div className={`reveal ${revealing ? 'is-revealing' : 'is-revealed'}`}>
       <div className="reveal-photo">
         {state.imageUrl && (
           <img
@@ -184,20 +249,16 @@ export function Reveal({ state, now }: { state: GameView; now: number }) {
             }}
           />
         )}
-        <div className="photo-corner photo-corner-tl" />
-        <div className="photo-corner photo-corner-br" />
-        <span className="photo-label">{revealing ? 'IDENTITY UNKNOWN' : 'MYSTERY SOLVED'}</span>
       </div>
-      <div className="reveal-caption">
-        <span className="eyebrow">{revealing ? 'WAIT FOR IT…' : 'THE SONG WAS REALLY ABOUT'}</span>
-        {revealing ? (
-          <h2>
-            Coming into focus<span className="blink">.</span>
-          </h2>
-        ) : (
+      {revealing ? (
+        <div className="reveal-caption">
+          <h2>Coming into focus…</h2>
+        </div>
+      ) : (
+        <NameTag tone="red" size="lg" tilt={-4} slap className="reveal-tag">
           <h2>{state.correctName}</h2>
-        )}
-      </div>
+        </NameTag>
+      )}
     </div>
   );
 }
@@ -205,9 +266,7 @@ export function Footer() {
   return (
     <footer className="site-footer">
       <span>A familiar name. A different story.</span>
-      <span>
-        Made for your kind of people <ArrowUpRight size={13} />
-      </span>
+      <span>Made for your kind of people</span>
     </footer>
   );
 }
@@ -223,8 +282,8 @@ export function Votes({ votes }: { votes?: Vote[] }) {
   if (!votes?.length) return null;
   const total = votes.reduce((sum, v) => sum + v.count, 0);
   return (
-    <section className="votes" aria-label="How the room voted">
-      <span className="eyebrow">HOW THE ROOM VOTED</span>
+    <section className="votes" aria-labelledby="votes-heading">
+      <h3 id="votes-heading">How the room voted</h3>
       {votes.map((v) => (
         <div className={`vote ${v.correct ? 'is-correct' : ''}`} key={v.colleagueId}>
           <span className="vote-name">

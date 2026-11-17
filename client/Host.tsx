@@ -120,7 +120,7 @@ export function Host() {
           onBackToStudio={() => setTab('studio')}
         />
       ) : (
-        <main className="empty-live panel">
+        <main className="empty-live sheet">
           <Radio size={40} />
           <h1>The stage is waiting.</h1>
           <p className="muted">
