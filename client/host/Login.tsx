@@ -29,7 +29,7 @@ export function Login({
     <div className="page-shell login-page">
       <header className="topbar">
         <Brand />
-        <span className="header-note">THE HOST HAS THE BEST SEAT.</span>
+        <span className="header-note">The host has the best seat.</span>
       </header>
       <main className="login-layout">
         <div className="login-copy">

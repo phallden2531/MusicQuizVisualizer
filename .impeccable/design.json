@@ -180,16 +180,7 @@
       "paper": {
         "role": "neutral",
         "displayName": "Paper",
-        "tonalRamp": [
-          "#14161f",
-          "#5b5850",
-          "#8d877b",
-          "#a39d90",
-          "#b9b2a3",
-          "#d9d1c1",
-          "#f1ece1",
-          "#fbf8f2"
-        ],
+        "tonalRamp": ["#14161f", "#5b5850", "#8d877b", "#b9b2a3", "#d9d1c1", "#f1ece1", "#fbf8f2"],
         "canonical": "oklch(98.0% 0.009 85)"
       },
       "paper-2": {

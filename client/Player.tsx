@@ -356,7 +356,7 @@ export function Player({ roomCode }: { roomCode: string }) {
         </>
       )}
       <footer className="player-footer">
-        <span>OFF THE RECORD</span>
+        <span>Off the Record</span>
         <span>Trust the lyrics. Not the names.</span>
       </footer>
     </div>

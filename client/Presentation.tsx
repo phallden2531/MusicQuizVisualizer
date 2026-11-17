@@ -313,7 +313,7 @@ export function Presentation({ roomCode }: { roomCode: string }) {
         </>
       )}
       <footer className="presentation-footer">
-        <span>ORIGINAL SONGS. FAMILIAR FACES.</span>
+        <span>Original songs. Familiar faces.</span>
         <span>{state?.title || 'The colleague music quiz'}</span>
       </footer>
     </div>

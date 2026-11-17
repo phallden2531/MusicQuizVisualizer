@@ -24,10 +24,21 @@
   --pink: #f39bbb;
   --teal: #48c1b0;
   --teal-deep: #17695e;
+  --teal-wash: #eaf6f3;
+  --white: #ffffff;
+  --paper-placeholder: #8d877b;
+  --paper-dot: #b9b2a3;
+  --error-ground: #3d1530;
+  --error-text: #ffd8d4;
+  --error-ground-light: #fde8e5;
+  --error-text-light: #7c1611;
+  --shadow-ink: #05091a;
   --display: 'Bricolage Grotesque Variable', 'Bricolage Grotesque', system-ui, sans-serif;
   --marker: 'Permanent Marker', 'Bricolage Grotesque Variable', cursive;
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-  --shadow-object: 0 18px 32px -18px rgb(5 9 26 / 0.85), 0 3px 6px -2px rgb(5 9 26 / 0.35);
+  --shadow-object:
+    0 18px 32px -18px color-mix(in srgb, var(--shadow-ink) 85%, transparent),
+    0 3px 6px -2px color-mix(in srgb, var(--shadow-ink) 35%, transparent);
   color-scheme: dark;
   font-family: var(--display);
   font-optical-sizing: auto;
@@ -173,7 +184,7 @@ input:focus,
 textarea:focus,
 select:focus {
   border-color: var(--yellow);
-  box-shadow: 0 0 0 3px rgb(246 201 69 / 0.22);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--yellow) 22%, transparent);
 }
 textarea {
   resize: vertical;
@@ -202,19 +213,19 @@ label[for] > span {
 .sheet input,
 .sheet textarea,
 .sheet select {
-  background-color: #fff;
+  background-color: var(--white);
   border-color: var(--paper-line);
   color: var(--ink);
 }
 .sheet input::placeholder,
 .sheet textarea::placeholder {
-  color: #8d877b;
+  color: var(--paper-placeholder);
 }
 .sheet input:focus,
 .sheet textarea:focus,
 .sheet select:focus {
   border-color: var(--ink);
-  box-shadow: 0 0 0 3px rgb(246 201 69 / 0.6);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--yellow) 60%, transparent);
 }
 
 /* ---------- Buttons and links ---------- */
@@ -242,7 +253,7 @@ label[for] > span {
 .button-primary {
   background: var(--red);
   color: var(--paper);
-  box-shadow: 0 10px 20px -12px rgb(212 43 37 / 0.9);
+  box-shadow: 0 10px 20px -12px color-mix(in srgb, var(--red) 90%, transparent);
 }
 .button-primary:hover:not(:disabled) {
   background: var(--red-deep);
@@ -427,7 +438,7 @@ label[for] > span {
   box-shadow: none;
 }
 .tag-name input::placeholder {
-  color: #a39d90;
+  color: var(--paper-placeholder);
 }
 .name-tag.is-slapped {
   animation: slap 0.6s var(--ease-out) both;
@@ -435,7 +446,7 @@ label[for] > span {
 @keyframes slap {
   from {
     transform: rotate(calc(var(--tilt) - 9deg)) scale(1.35);
-    box-shadow: 0 50px 60px -24px rgb(5 9 26 / 0.7);
+    box-shadow: 0 50px 60px -24px color-mix(in srgb, var(--shadow-ink) 70%, transparent);
   }
   to {
     transform: rotate(var(--tilt)) scale(1);
@@ -537,7 +548,7 @@ label[for] > span {
 .connected > .status-dot,
 .is-ready .status-dot {
   background: var(--teal);
-  box-shadow: 0 0 0 3px rgb(72 193 176 / 0.25);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--teal) 25%, transparent);
 }
 .notice {
   display: flex;
@@ -553,18 +564,18 @@ label[for] > span {
   line-height: 1.45;
 }
 .notice-error {
-  background: #3d1530;
+  background: var(--error-ground);
   box-shadow: inset 0 0 0 1.5px var(--red);
-  color: #ffd8d4;
+  color: var(--error-text);
 }
 .sheet .notice-error {
-  background: #fde8e5;
-  color: #7c1611;
+  background: var(--error-ground-light);
+  color: var(--error-text-light);
 }
 .paused-notice,
 .connection-notice {
-  background: rgb(246 201 69 / 0.13);
-  box-shadow: inset 0 0 0 1.5px rgb(246 201 69 / 0.7);
+  background: color-mix(in srgb, var(--yellow) 13%, transparent);
+  box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--yellow) 70%, transparent);
 }
 .paused-notice strong {
   color: var(--yellow);
@@ -764,14 +775,14 @@ label[for] > span {
 .vote-bar {
   height: 12px;
   border-radius: 6px;
-  background: rgb(251 248 242 / 0.1);
+  background: color-mix(in srgb, var(--paper) 10%, transparent);
   overflow: hidden;
 }
 .vote-bar i {
   display: block;
   height: 100%;
   border-radius: 6px;
-  background: rgb(251 248 242 / 0.5);
+  background: color-mix(in srgb, var(--paper) 50%, transparent);
 }
 .vote.is-correct .vote-bar i {
   background: var(--yellow);
@@ -880,9 +891,8 @@ label[for] > span {
   padding: 22px 0;
 }
 .header-note {
-  font-size: 0.8rem;
-  font-weight: 650;
-  letter-spacing: 0.08em;
+  font-size: 0.9rem;
+  font-weight: 600;
   color: var(--muted-2);
 }
 .site-footer,
@@ -943,7 +953,7 @@ label[for] > span {
 .join-code input {
   flex: 1;
   background: var(--paper);
-  border: 2px dashed rgb(20 22 31 / 0.45);
+  border: 2px dashed color-mix(in srgb, var(--ink) 45%, transparent);
   color: var(--ink);
   font-size: 1.3rem;
   font-weight: 800;
@@ -951,7 +961,7 @@ label[for] > span {
   text-align: center;
 }
 .join-code input::placeholder {
-  color: #8d877b;
+  color: var(--paper-placeholder);
   letter-spacing: 0.1em;
 }
 .join-code input:focus {
@@ -1331,7 +1341,7 @@ label[for] > span {
 .upload-zone.has-upload {
   border-style: solid;
   border-color: var(--teal);
-  background: #eaf6f3;
+  background: var(--teal-wash);
 }
 .upload-icon {
   display: grid;
@@ -1353,7 +1363,7 @@ label[for] > span {
   border-radius: 8px;
   object-fit: cover;
   transform: rotate(-3deg);
-  box-shadow: 0 8px 16px -10px rgb(20 22 31 / 0.6);
+  box-shadow: 0 8px 16px -10px color-mix(in srgb, var(--ink) 60%, transparent);
 }
 .audio-preview {
   display: flex;
@@ -1647,7 +1657,7 @@ label[for] > span {
   transform: rotate(-0.5deg);
 }
 .guest-badge .status-dot {
-  background: #b9b2a3;
+  background: var(--paper-dot);
 }
 .chip-remove {
   display: grid;
@@ -1811,7 +1821,7 @@ label[for] > span {
 .screen-room-code {
   width: 100%;
   padding-top: 1.6vh;
-  border-top: 4px dotted rgb(20 22 31 / 0.4);
+  border-top: 4px dotted color-mix(in srgb, var(--ink) 40%, transparent);
   font-size: clamp(3rem, 5vw, 6rem);
   font-weight: 800;
   letter-spacing: 0.08em;
@@ -2344,7 +2354,7 @@ details.lyrics-card[open] > summary {
   font-size: 1.15rem;
   line-height: 1.2;
   overflow-wrap: anywhere;
-  box-shadow: 0 8px 14px -10px rgb(5 9 26 / 0.9);
+  box-shadow: 0 8px 14px -10px color-mix(in srgb, var(--shadow-ink) 90%, transparent);
   transition:
     transform 0.3s var(--ease-out),
     box-shadow 0.3s var(--ease-out);
@@ -2376,7 +2386,7 @@ details.lyrics-card[open] > summary {
   transform: translateY(-5px) rotate(-2.5deg);
   box-shadow:
     0 0 0 3px var(--yellow),
-    0 22px 26px -14px rgb(5 9 26 / 0.95);
+    0 22px 26px -14px color-mix(in srgb, var(--shadow-ink) 95%, transparent);
 }
 .suspect:disabled {
   opacity: 0.5;
@@ -2476,7 +2486,7 @@ details.lyrics-card[open] > summary {
 }
 .personal-result b {
   padding-left: 16px;
-  border-left: 3px dotted rgb(20 22 31 / 0.4);
+  border-left: 3px dotted color-mix(in srgb, var(--ink) 40%, transparent);
   font-size: 1.8rem;
   font-weight: 800;
   font-variant-numeric: tabular-nums;

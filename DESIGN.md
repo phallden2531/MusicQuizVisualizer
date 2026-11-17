@@ -223,6 +223,15 @@ Red, teal, yellow and pink rotate in that order as the tone of guest badges, sus
 - **Paper** (`paper`) and **Ground Text** (`text`, the same off-white): the writing strip of a name tag, badge and suspect bodies, sheets, the QR backing, and all primary text on navy.
 - **Paper 2** (`paper-2`) and **Paper Line** (`paper-line`): hover fills and hairlines inside sheets.
 - **Ink** (`ink`) and **Ink Muted** (`ink-muted`): text on paper, yellow, pink and teal.
+- **White** (`white`): input fields inside sheets, one step brighter than the paper around them.
+- **Paper Placeholder** (`paper-placeholder`) and **Paper Dot** (`paper-dot`): placeholder text on paper and on name-tag strips, and the idle status dot on a guest badge.
+- **Teal Wash** (`teal-wash`): the fill of an upload zone once its file is in.
+
+### Feedback
+
+- **Error Ground / Error Text** (`error-ground`, `error-text`): error notices on navy, outlined in sticker red.
+- **Error Ground Light / Error Text Light** (`error-ground-light`, `error-text-light`): the same notice inside a paper sheet.
+- **Shadow Ink** (`shadow-ink`): the near-black navy every object shadow is mixed from. Translucent tints of any token are written as `color-mix(in srgb, var(--token) N%, transparent)`, never as raw `rgb()`.
 - **Muted / Muted 2** (`muted`, `muted-2`): secondary text and captions on navy, placeholders.
 
 ### Named Rules
