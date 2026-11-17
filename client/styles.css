@@ -35,6 +35,41 @@
   --shadow-ink: #05091a;
   --display: 'Bricolage Grotesque Variable', 'Bricolage Grotesque', system-ui, sans-serif;
   --marker: 'Permanent Marker', 'Bricolage Grotesque Variable', cursive;
+  /* Type ramp: app UI in rem, the projector and name tags scale fluidly. */
+  --fs-micro: 0.625rem;
+  --fs-caption: 0.75rem;
+  --fs-small: 0.875rem;
+  --fs-body: 1rem;
+  --fs-lead: 1.125rem;
+  --fs-subtitle: 1.375rem;
+  --fs-title: 1.75rem;
+  --fs-heading: 2.25rem;
+  --fs-figure: 2.5rem;
+  --fs-headline: clamp(2.2rem, 4.4vw, 3.6rem);
+  --fs-display: clamp(2.6rem, 6.2vw, 5.4rem);
+  --fs-phone-headline: clamp(2.2rem, 10vw, 3.2rem);
+  --fs-stage-base: clamp(16px, 1.15vw, 22px);
+  --fs-stage-title: clamp(2rem, 2.8vw, 3.6rem);
+  --fs-stage-headline: clamp(2.2rem, 3.8vw, 4.8rem);
+  --fs-stage-display: clamp(3rem, 6vw, 7rem);
+  --fs-serial: clamp(3rem, 5vw, 6rem);
+  /* Name tag base sizes; everything inside a tag is in em of these. */
+  --tag-xs: 7px;
+  --tag-sm: 9px;
+  --tag-md: 13px;
+  --tag-lg: 17px;
+  --tag-stage-sm: clamp(9px, 0.75vw, 14px);
+  --tag-stage-md: clamp(11px, 1vw, 20px);
+  --tag-stage-lg: clamp(14px, 1.4vw, 26px);
+  --tag-stage-xl: clamp(18px, 1.9vw, 34px);
+  /* Corner radii */
+  --r-xs: 4px;
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 12px;
+  --r-xl: 16px;
+  --r-2xl: 20px;
+  --r-pill: 999px;
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --shadow-object:
     0 18px 32px -18px color-mix(in srgb, var(--shadow-ink) 85%, transparent),
@@ -165,9 +200,9 @@ textarea,
 select {
   width: 100%;
   min-width: 0;
-  border-radius: 10px;
+  border-radius: var(--r-md);
   padding: 12px 14px;
-  font-size: 1rem;
+  font-size: var(--fs-body);
   outline: none;
   background: var(--navy-950);
   border: 1.5px solid var(--navy-500);
@@ -199,13 +234,13 @@ select {
 }
 label {
   display: block;
-  font-size: 0.9rem;
+  font-size: var(--fs-small);
   font-weight: 700;
   margin: 0 0 8px;
 }
 label[for] > span {
   margin-left: 6px;
-  font-size: 0.7rem;
+  font-size: var(--fs-caption);
   font-weight: 600;
   letter-spacing: 0.08em;
   color: var(--ink-muted);
@@ -236,8 +271,8 @@ label[for] > span {
   gap: 8px;
   min-height: 50px;
   padding: 0 22px;
-  border-radius: 12px;
-  font-size: 1rem;
+  border-radius: var(--r-lg);
+  font-size: var(--fs-body);
   font-weight: 750;
   letter-spacing: -0.01em;
   white-space: nowrap;
@@ -288,7 +323,7 @@ label[for] > span {
   place-items: center;
   width: 42px;
   height: 42px;
-  border-radius: 10px;
+  border-radius: var(--r-md);
   color: var(--muted);
   transition:
     background-color 0.18s,
@@ -334,7 +369,7 @@ label[for] > span {
   align-items: center;
   gap: 2px;
   padding: 5px 6px 6px;
-  border-radius: 9px;
+  border-radius: var(--r-md);
   background: var(--red);
   color: var(--paper);
   transform: rotate(-3deg);
@@ -346,25 +381,25 @@ label[for] > span {
 }
 .brand-hello {
   font-weight: 800;
-  font-size: 15px;
+  font-size: var(--fs-small);
   line-height: 1;
   letter-spacing: 0.02em;
 }
 .brand-name {
   background: var(--paper);
   color: var(--ink);
-  border-radius: 4px;
+  border-radius: var(--r-xs);
   padding: 3px 9px 2px;
   font-family: var(--marker);
-  font-size: 15px;
+  font-size: var(--fs-small);
   line-height: 1.2;
   white-space: nowrap;
 }
 .brand-small .brand-hello {
-  font-size: 12px;
+  font-size: var(--fs-caption);
 }
 .brand-small .brand-name {
-  font-size: 13px;
+  font-size: var(--fs-caption);
 }
 
 /* ---------- The name tag ---------- */
@@ -383,16 +418,16 @@ label[for] > span {
   box-shadow: var(--shadow-object);
 }
 .tag-sm {
-  font-size: 9px;
+  font-size: var(--tag-sm);
 }
 .tag-md {
-  font-size: 13px;
+  font-size: var(--tag-md);
 }
 .tag-lg {
-  font-size: 17px;
+  font-size: var(--tag-lg);
 }
 .tag-xl {
-  font-size: clamp(18px, 1.9vw, 34px);
+  font-size: var(--tag-stage-xl);
 }
 .tag-hello {
   font-weight: 800;
@@ -460,7 +495,7 @@ label[for] > span {
   position: relative;
   background: var(--c, var(--yellow));
   color: var(--on, var(--ink));
-  border-radius: 10px;
+  border-radius: var(--r-md);
   -webkit-mask:
     radial-gradient(circle at 0 50%, #0000 var(--notch), #000 calc(var(--notch) + 0.5px)) left / 51%
       100% no-repeat,
@@ -518,7 +553,7 @@ label[for] > span {
   margin-top: 40px;
 }
 .decoy-compact .name-tag {
-  font-size: 12px;
+  font-size: var(--tag-md);
 }
 
 /* ---------- Status and notices ---------- */
@@ -527,8 +562,8 @@ label[for] > span {
   align-items: center;
   gap: 8px;
   padding: 7px 12px;
-  border-radius: 999px;
-  font-size: 0.75rem;
+  border-radius: var(--r-pill);
+  font-size: var(--fs-caption);
   font-weight: 700;
   letter-spacing: 0.06em;
   color: var(--muted);
@@ -557,10 +592,10 @@ label[for] > span {
   gap: 6px 12px;
   margin: 14px 0;
   padding: 14px 16px;
-  border-radius: 12px;
+  border-radius: var(--r-lg);
   background: var(--navy-700);
   color: var(--text);
-  font-size: 0.95rem;
+  font-size: var(--fs-body);
   line-height: 1.45;
 }
 .notice-error {
@@ -584,7 +619,7 @@ label[for] > span {
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  font-size: 0.9rem;
+  font-size: var(--fs-small);
   color: var(--muted);
 }
 .saved-indicator.is-dirty {
@@ -598,7 +633,7 @@ label[for] > span {
   align-items: center;
   gap: 6px;
   margin: 12px 0;
-  font-size: 0.9rem;
+  font-size: var(--fs-small);
   font-weight: 650;
   color: var(--teal-deep);
 }
@@ -622,7 +657,7 @@ label[for] > span {
 .equalizer i {
   display: block;
   width: 3px;
-  border-radius: 2px;
+  border-radius: var(--r-pill);
   background: var(--yellow);
 }
 .equalizer-large {
@@ -656,7 +691,7 @@ label[for] > span {
   display: grid;
   place-items: center;
   aspect-ratio: 1;
-  border-radius: 8px;
+  border-radius: var(--r-md);
   background: var(--paper);
   overflow: hidden;
 }
@@ -668,7 +703,7 @@ label[for] > span {
 }
 .qr-code span {
   padding: 12px;
-  font-size: 0.8rem;
+  font-size: var(--fs-small);
   color: var(--ink-muted);
   text-align: center;
 }
@@ -681,7 +716,7 @@ label[for] > span {
   display: flex;
   justify-content: space-between;
   padding: 0 10px 10px;
-  font-size: 0.72rem;
+  font-size: var(--fs-caption);
   font-weight: 700;
   letter-spacing: 0.1em;
   color: var(--muted-2);
@@ -714,11 +749,11 @@ label[for] > span {
 }
 .standing-name small {
   font-family: var(--display);
-  font-size: 0.6rem;
+  font-size: var(--fs-micro);
   font-weight: 800;
   letter-spacing: 0.08em;
   padding: 3px 6px;
-  border-radius: 5px;
+  border-radius: var(--r-sm);
   background: var(--yellow);
   color: var(--ink);
 }
@@ -754,7 +789,7 @@ label[for] > span {
   text-align: left;
 }
 .votes h3 {
-  font-size: 1rem;
+  font-size: var(--fs-body);
   letter-spacing: -0.01em;
   color: var(--muted);
 }
@@ -774,14 +809,14 @@ label[for] > span {
 }
 .vote-bar {
   height: 12px;
-  border-radius: 6px;
+  border-radius: var(--r-pill);
   background: color-mix(in srgb, var(--paper) 10%, transparent);
   overflow: hidden;
 }
 .vote-bar i {
   display: block;
   height: 100%;
-  border-radius: 6px;
+  border-radius: var(--r-pill);
   background: color-mix(in srgb, var(--paper) 50%, transparent);
 }
 .vote.is-correct .vote-bar i {
@@ -805,7 +840,7 @@ label[for] > span {
 }
 .last-call strong {
   display: block;
-  font-size: 1.35rem;
+  font-size: var(--fs-subtitle);
   font-weight: 800;
   letter-spacing: -0.02em;
 }
@@ -821,19 +856,19 @@ label[for] > span {
   justify-items: center;
   min-width: 112px;
   padding: 10px 20px 12px;
-  font-size: 2.6rem;
+  font-size: var(--fs-figure);
   font-weight: 800;
   line-height: 1;
   font-variant-numeric: tabular-nums;
   transform: rotate(2deg);
 }
 .countdown-number small {
-  font-size: 0.7rem;
+  font-size: var(--fs-caption);
   letter-spacing: 0.12em;
   margin-top: 4px;
 }
 .countdown-number.is-paused {
-  font-size: 1rem;
+  font-size: var(--fs-body);
 }
 
 /* ---------- The reveal ---------- */
@@ -845,7 +880,7 @@ label[for] > span {
   position: relative;
   width: min(100%, 340px);
   aspect-ratio: 4 / 5;
-  border-radius: 14px;
+  border-radius: var(--r-xl);
   overflow: hidden;
   background: var(--navy-700);
   box-shadow: var(--shadow-object);
@@ -870,7 +905,7 @@ label[for] > span {
   text-align: center;
 }
 .reveal-caption h2 {
-  font-size: 1.8rem;
+  font-size: var(--fs-title);
 }
 
 /* ---------- Shared page frame (home, host) ---------- */
@@ -891,7 +926,7 @@ label[for] > span {
   padding: 22px 0;
 }
 .header-note {
-  font-size: 0.9rem;
+  font-size: var(--fs-small);
   font-weight: 600;
   color: var(--muted-2);
 }
@@ -904,7 +939,7 @@ label[for] > span {
   flex-wrap: wrap;
   margin-top: auto;
   padding: 28px 0;
-  font-size: 0.85rem;
+  font-size: var(--fs-small);
   color: var(--muted-2);
 }
 .loading-page {
@@ -926,14 +961,14 @@ label[for] > span {
   padding: 40px 0 64px;
 }
 .home-copy h1 {
-  font-size: clamp(2.6rem, 6.2vw, 5.4rem);
+  font-size: var(--fs-display);
   letter-spacing: -0.04em;
   line-height: 0.98;
 }
 .intro {
   max-width: 34em;
   margin-top: 22px;
-  font-size: 1.15rem;
+  font-size: var(--fs-lead);
   color: var(--muted);
 }
 .join-code {
@@ -943,7 +978,7 @@ label[for] > span {
   transform: rotate(-1.2deg);
 }
 .join-code label {
-  font-size: 1rem;
+  font-size: var(--fs-body);
   margin-bottom: 12px;
 }
 .join-code form > div {
@@ -955,7 +990,7 @@ label[for] > span {
   background: var(--paper);
   border: 2px dashed color-mix(in srgb, var(--ink) 45%, transparent);
   color: var(--ink);
-  font-size: 1.3rem;
+  font-size: var(--fs-subtitle);
   font-weight: 800;
   letter-spacing: 0.14em;
   text-align: center;
@@ -971,14 +1006,14 @@ label[for] > span {
 }
 .home-note {
   margin-top: 20px;
-  font-size: 0.95rem;
+  font-size: var(--fs-body);
   color: var(--muted-2);
 }
 .home .decoy-art {
   min-height: 520px;
 }
 .home .decoy-art .name-tag {
-  font-size: clamp(14px, 1.7vw, 22px);
+  font-size: var(--tag-stage-lg);
 }
 
 /* ---------- Host: login ---------- */
@@ -991,13 +1026,13 @@ label[for] > span {
   padding: 40px 0 64px;
 }
 .login-copy h1 {
-  font-size: clamp(2.6rem, 5.6vw, 4.8rem);
+  font-size: var(--fs-display);
   letter-spacing: -0.04em;
 }
 .sheet {
   background: var(--paper);
   color: var(--ink);
-  border-radius: 20px;
+  border-radius: var(--r-2xl);
   padding: clamp(20px, 3vw, 34px);
   box-shadow: var(--shadow-object);
 }
@@ -1009,7 +1044,7 @@ label[for] > span {
   color: var(--ink);
 }
 .login-card h2 {
-  font-size: 1.8rem;
+  font-size: var(--fs-title);
 }
 .login-card > p {
   margin: 8px 0 26px;
@@ -1020,7 +1055,7 @@ label[for] > span {
 .form-note {
   margin-top: 18px;
   text-align: center;
-  font-size: 0.92rem;
+  font-size: var(--fs-small);
   color: var(--ink-muted);
 }
 .form-note a {
@@ -1038,7 +1073,7 @@ label[for] > span {
   display: flex;
   gap: 4px;
   padding: 4px;
-  border-radius: 14px;
+  border-radius: var(--r-xl);
   background: var(--navy-900);
 }
 .main-nav button {
@@ -1046,7 +1081,7 @@ label[for] > span {
   align-items: center;
   gap: 8px;
   padding: 10px 16px;
-  border-radius: 10px;
+  border-radius: var(--r-md);
   font-weight: 650;
   color: var(--muted);
   transition:
@@ -1080,7 +1115,7 @@ label[for] > span {
   margin-bottom: 28px;
 }
 .studio-heading h1 {
-  font-size: clamp(2.2rem, 4.4vw, 3.6rem);
+  font-size: var(--fs-headline);
   letter-spacing: -0.04em;
 }
 .studio-heading p {
@@ -1111,7 +1146,7 @@ label[for] > span {
   align-items: center;
   gap: 8px;
   padding: 10px 14px;
-  border-radius: 10px;
+  border-radius: var(--r-md);
   font-weight: 700;
   color: var(--muted);
   transition:
@@ -1128,8 +1163,8 @@ label[for] > span {
 .section-tabs button span {
   min-width: 26px;
   padding: 2px 7px;
-  border-radius: 6px;
-  font-size: 0.8rem;
+  border-radius: var(--r-sm);
+  font-size: var(--fs-small);
   font-variant-numeric: tabular-nums;
   background: var(--navy-600);
   color: var(--text);
@@ -1158,7 +1193,7 @@ label[for] > span {
   display: flex;
   justify-content: space-between;
   padding: 0 4px 10px;
-  font-size: 0.75rem;
+  font-size: var(--fs-caption);
   font-weight: 700;
   letter-spacing: 0.1em;
   color: var(--muted-2);
@@ -1174,7 +1209,7 @@ label[for] > span {
   gap: 10px;
   width: 100%;
   padding: 12px;
-  border-radius: 12px;
+  border-radius: var(--r-lg);
   text-align: left;
   color: var(--text);
   transition: background-color 0.18s;
@@ -1195,7 +1230,7 @@ label[for] > span {
 }
 .song-row small {
   margin-top: 2px;
-  font-size: 0.82rem;
+  font-size: var(--fs-small);
   color: var(--muted);
 }
 .song-row.selected small {
@@ -1216,7 +1251,7 @@ label[for] > span {
   gap: 8px;
   margin-top: 8px;
   min-height: 50px;
-  border-radius: 12px;
+  border-radius: var(--r-lg);
   border: 1.5px dashed var(--navy-500);
   font-weight: 700;
   color: var(--text);
@@ -1233,7 +1268,7 @@ label[for] > span {
   gap: 10px;
   margin-top: 18px;
   padding: 0 4px;
-  font-size: 0.85rem;
+  font-size: var(--fs-small);
   line-height: 1.5;
   color: var(--muted-2);
 }
@@ -1249,7 +1284,7 @@ label[for] > span {
   text-align: center;
 }
 .empty-setlist h2 {
-  font-size: 2rem;
+  font-size: var(--fs-heading);
 }
 .empty-setlist h2 span {
   color: var(--red);
@@ -1270,16 +1305,16 @@ label[for] > span {
   display: flex;
   align-items: center;
   gap: 14px;
-  font-size: 1.6rem;
+  font-size: var(--fs-title);
 }
 .track-no {
   display: inline-grid;
   place-items: center;
   min-width: 2.2em;
   padding: 6px 10px;
-  border-radius: 8px;
+  border-radius: var(--r-md);
   background: var(--yellow);
-  font-size: 1rem;
+  font-size: var(--fs-body);
   font-variant-numeric: tabular-nums;
   letter-spacing: 0;
   transform: rotate(-3deg);
@@ -1308,7 +1343,7 @@ label[for] > span {
   min-height: 170px;
   margin: 0;
   padding: 22px;
-  border-radius: 14px;
+  border-radius: var(--r-xl);
   border: 1.5px dashed var(--paper-line);
   text-align: center;
   cursor: pointer;
@@ -1332,7 +1367,7 @@ label[for] > span {
   z-index: 2;
 }
 .upload-zone strong {
-  font-size: 1rem;
+  font-size: var(--fs-body);
 }
 .upload-zone small {
   font-weight: 500;
@@ -1360,7 +1395,7 @@ label[for] > span {
   width: 76px;
   height: 92px;
   margin-bottom: 4px;
-  border-radius: 8px;
+  border-radius: var(--r-md);
   object-fit: cover;
   transform: rotate(-3deg);
   box-shadow: 0 8px 16px -10px color-mix(in srgb, var(--ink) 60%, transparent);
@@ -1371,7 +1406,7 @@ label[for] > span {
   gap: 14px;
   margin: 14px 0 6px;
   padding: 8px 16px 8px 8px;
-  border-radius: 12px;
+  border-radius: var(--r-lg);
   background: var(--paper-2);
 }
 .audio-preview audio {
@@ -1407,7 +1442,7 @@ label[for] > span {
   flex-wrap: wrap;
   gap: 10px;
   margin-top: 14px;
-  font-size: 0.85rem;
+  font-size: var(--fs-small);
   color: var(--ink-muted);
 }
 .editor-footnote span {
@@ -1429,7 +1464,7 @@ label[for] > span {
   gap: 4px;
 }
 .roster-add h2 {
-  font-size: 1.8rem;
+  font-size: var(--fs-title);
 }
 .roster-add > p {
   margin: 6px 0 18px;
@@ -1451,12 +1486,12 @@ label[for] > span {
 .colleague-row .avatar {
   width: 14px;
   height: 14px;
-  border-radius: 4px;
+  border-radius: var(--r-xs);
   background: var(--c, var(--teal));
 }
 .colleague-row input {
   font-family: var(--marker);
-  font-size: 1.1rem;
+  font-size: var(--fs-lead);
   padding: 9px 12px;
 }
 
@@ -1475,7 +1510,7 @@ label[for] > span {
   padding-bottom: 16px;
   margin-bottom: 20px;
   border-bottom: 1px solid var(--navy-600);
-  font-size: 0.75rem;
+  font-size: var(--fs-caption);
   font-weight: 700;
   letter-spacing: 0.1em;
   color: var(--muted);
@@ -1494,7 +1529,7 @@ label[for] > span {
   gap: 8px;
 }
 .host-status h2 {
-  font-size: 2rem;
+  font-size: var(--fs-heading);
 }
 .now-track {
   display: grid;
@@ -1504,18 +1539,18 @@ label[for] > span {
   border-top: 1px dashed var(--paper-line);
 }
 .now-track strong {
-  font-size: 1.1rem;
+  font-size: var(--fs-lead);
 }
 .track-progress {
   height: 10px;
-  border-radius: 5px;
+  border-radius: var(--r-pill);
   background: var(--paper-2);
   overflow: hidden;
 }
 .track-progress i {
   display: block;
   height: 100%;
-  border-radius: 5px;
+  border-radius: var(--r-pill);
   background: var(--red);
   transition: width 0.3s linear;
 }
@@ -1533,19 +1568,19 @@ label[for] > span {
 }
 .live-metrics strong {
   display: block;
-  font-size: 2.4rem;
+  font-size: var(--fs-figure);
   font-weight: 800;
   line-height: 1;
   font-variant-numeric: tabular-nums;
 }
 .live-metrics small {
-  font-size: 1rem;
+  font-size: var(--fs-body);
   color: var(--ink-muted);
 }
 .live-metrics span {
   display: block;
   margin-top: 6px;
-  font-size: 0.75rem;
+  font-size: var(--fs-caption);
   font-weight: 700;
   letter-spacing: 0.1em;
   color: var(--ink-muted);
@@ -1563,8 +1598,8 @@ label[for] > span {
   align-items: center;
   gap: 6px;
   padding: 6px 12px;
-  border-radius: 999px;
-  font-size: 0.9rem;
+  border-radius: var(--r-pill);
+  font-size: var(--fs-small);
   font-weight: 650;
   box-shadow: inset 0 0 0 1.5px var(--paper-line);
   color: var(--ink-muted);
@@ -1584,7 +1619,7 @@ label[for] > span {
   justify-content: center;
   gap: 8px;
   margin-top: 4px;
-  font-size: 0.9rem;
+  font-size: var(--fs-small);
   font-weight: 650;
   color: var(--ink-muted);
 }
@@ -1616,12 +1651,12 @@ label[for] > span {
   justify-items: start;
 }
 .room-code-label {
-  font-size: 0.8rem;
+  font-size: var(--fs-small);
   font-weight: 700;
   letter-spacing: 0.1em;
 }
 .room-code {
-  font-size: 2.6rem;
+  font-size: var(--fs-figure);
   font-weight: 800;
   letter-spacing: 0.08em;
   line-height: 1.1;
@@ -1635,11 +1670,11 @@ label[for] > span {
   gap: 8px;
   --band: 9px;
   padding: calc(6px + var(--band)) 12px 7px;
-  border-radius: 9px;
+  border-radius: var(--r-md);
   background: linear-gradient(var(--c, var(--teal)) 0 var(--band), var(--paper) 0);
   color: var(--ink);
   font-family: var(--marker);
-  font-size: 1.1rem;
+  font-size: var(--fs-lead);
   line-height: 1.2;
   box-shadow: var(--shadow-object);
   animation: slap 0.55s var(--ease-out) both;
@@ -1665,7 +1700,7 @@ label[for] > span {
   width: 24px;
   height: 24px;
   margin-right: -4px;
-  border-radius: 6px;
+  border-radius: var(--r-sm);
   color: var(--ink-muted);
 }
 .chip-remove:hover {
@@ -1699,7 +1734,7 @@ label[for] > span {
   text-align: center;
 }
 .empty-live h1 {
-  font-size: 2.2rem;
+  font-size: var(--fs-heading);
 }
 
 /* ---------- Presentation (projector) ---------- */
@@ -1708,7 +1743,7 @@ label[for] > span {
   padding: 0 4vw;
   display: flex;
   flex-direction: column;
-  font-size: clamp(16px, 1.15vw, 22px);
+  font-size: var(--fs-stage-base);
 }
 .presentation-shell audio:not([controls]) {
   display: none;
@@ -1742,7 +1777,7 @@ label[for] > span {
   text-align: center;
 }
 .screen-access h1 {
-  font-size: clamp(2.4rem, 4vw, 4.4rem);
+  font-size: var(--fs-stage-headline);
 }
 .audio-enable {
   display: flex;
@@ -1750,7 +1785,7 @@ label[for] > span {
   gap: 18px;
   margin: 1vh 0;
   padding: 16px 20px;
-  border-radius: 14px;
+  border-radius: var(--r-xl);
   background: var(--yellow);
   color: var(--ink);
 }
@@ -1789,7 +1824,7 @@ label[for] > span {
   padding-inline: 0.6em;
 }
 .screen-lobby-copy h1 {
-  font-size: clamp(2.2rem, 3.5vw, 4.4rem);
+  font-size: var(--fs-stage-headline);
   letter-spacing: -0.035em;
   max-width: 14em;
 }
@@ -1822,7 +1857,7 @@ label[for] > span {
   width: 100%;
   padding-top: 1.6vh;
   border-top: 4px dotted color-mix(in srgb, var(--ink) 40%, transparent);
-  font-size: clamp(3rem, 5vw, 6rem);
+  font-size: var(--fs-serial);
   font-weight: 800;
   letter-spacing: 0.08em;
   line-height: 1;
@@ -1861,7 +1896,7 @@ label[for] > span {
 .guest-empty {
   align-self: center;
   padding: 0.5em 1em;
-  border-radius: 10px;
+  border-radius: var(--r-md);
   border: 2px dashed var(--navy-500);
   font-family: var(--marker);
   font-size: 1.2em;
@@ -1870,7 +1905,7 @@ label[for] > span {
 
 /* While the sound check banner shows, the lobby gives up height so nothing scrolls */
 .presentation-shell:has(.audio-enable) .lobby-hello {
-  font-size: clamp(14px, 1.4vw, 26px);
+  font-size: var(--tag-stage-lg);
 }
 .presentation-shell:has(.audio-enable) .screen-lobby-copy {
   gap: 3vh;
@@ -1917,7 +1952,7 @@ label[for] > span {
   margin: 2.4vh 0 3vh;
 }
 .screen-song-heading h1 {
-  font-size: clamp(2.2rem, 3.8vw, 4.8rem);
+  font-size: var(--fs-stage-headline);
   letter-spacing: -0.04em;
 }
 .screen-song-heading .equalizer {
@@ -1926,7 +1961,7 @@ label[for] > span {
 .mystery-tag {
   flex: none;
   min-width: 9em;
-  font-size: clamp(8px, 0.72vw, 14px);
+  font-size: var(--tag-stage-sm);
 }
 .screen-round > .screen-lyrics-panel {
   flex: 1;
@@ -2026,7 +2061,7 @@ label[for] > span {
   height: 40vh;
 }
 .screen-results .reveal-tag {
-  font-size: clamp(13px, 1.1vw, 22px);
+  font-size: var(--tag-stage-md);
 }
 .screen-results .reveal-caption h2 {
   font-size: 2.4em;
@@ -2040,7 +2075,7 @@ label[for] > span {
   min-width: 0;
 }
 .scoreboard-heading {
-  font-size: clamp(2rem, 2.8vw, 3.6rem);
+  font-size: var(--fs-stage-title);
   margin-bottom: 2.4vh;
 }
 .screen-scoreboard .standing {
@@ -2057,7 +2092,7 @@ label[for] > span {
   text-align: center;
 }
 .screen-finale h1 {
-  font-size: clamp(3rem, 6vw, 7rem);
+  font-size: var(--fs-stage-display);
   letter-spacing: -0.045em;
 }
 .screen-finale > p {
@@ -2085,10 +2120,10 @@ label[for] > span {
   order: 3;
 }
 .podium-place .name-tag {
-  font-size: clamp(10px, 0.95vw, 18px);
+  font-size: var(--tag-stage-md);
 }
 .podium-0 .name-tag {
-  font-size: clamp(13px, 1.25vw, 24px);
+  font-size: var(--tag-stage-lg);
 }
 .podium-rank {
   font-size: 1.6em;
@@ -2140,13 +2175,13 @@ label[for] > span {
   display: inline-flex;
   align-items: baseline;
   gap: 8px;
-  font-size: 0.72rem;
+  font-size: var(--fs-caption);
   font-weight: 700;
   letter-spacing: 0.1em;
   color: var(--muted);
 }
 .player-room strong {
-  font-size: 1.15rem;
+  font-size: var(--fs-lead);
   letter-spacing: 0.08em;
   color: var(--text);
 }
@@ -2167,7 +2202,7 @@ label[for] > span {
 .player-join h1,
 .player-lobby h1,
 .player-finale h1 {
-  font-size: clamp(2.4rem, 11vw, 3.4rem);
+  font-size: var(--fs-phone-headline);
   letter-spacing: -0.04em;
 }
 .player-join form {
@@ -2179,7 +2214,7 @@ label[for] > span {
 .join-tag {
   width: 100%;
   min-width: 0;
-  font-size: clamp(13px, 4vw, 17px);
+  font-size: var(--tag-lg);
 }
 .join-tag .tag-name {
   font-size: 2em;
@@ -2189,12 +2224,12 @@ label[for] > span {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  font-size: 0.9rem;
+  font-size: var(--fs-small);
   color: var(--muted);
 }
 .lobby-tag {
   margin: 8px 0 10px;
-  font-size: 14px;
+  font-size: var(--tag-md);
 }
 .lobby-info {
   display: flex;
@@ -2217,7 +2252,7 @@ label[for] > span {
   text-align: left;
 }
 .how-to h2 {
-  font-size: 1.4rem;
+  font-size: var(--fs-subtitle);
 }
 .how-to p {
   margin: 6px 0 16px;
@@ -2245,7 +2280,7 @@ label[for] > span {
   flex: none;
   width: 32px;
   height: 32px;
-  border-radius: 7px;
+  border-radius: var(--r-sm);
   background: var(--yellow);
   color: var(--ink);
   font-weight: 800;
@@ -2272,7 +2307,7 @@ label[for] > span {
   margin: 14px 0 18px;
 }
 .player-round-heading h1 {
-  font-size: clamp(2.2rem, 10vw, 3rem);
+  font-size: var(--fs-phone-headline);
   letter-spacing: -0.04em;
 }
 .lyrics-card {
@@ -2284,7 +2319,7 @@ details.lyrics-card > summary {
   gap: 8px;
   cursor: pointer;
   list-style: none;
-  font-size: 0.75rem;
+  font-size: var(--fs-caption);
   font-weight: 800;
   letter-spacing: 0.1em;
   color: var(--muted);
@@ -2304,14 +2339,14 @@ details.lyrics-card[open] > summary {
   margin-top: 14px;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
-  font-size: 1.08rem;
+  font-size: var(--fs-lead);
   line-height: 1.65;
 }
 .answer-picker {
   margin-top: 32px;
 }
 .answer-picker h2 {
-  font-size: 1.9rem;
+  font-size: var(--fs-title);
 }
 .answer-picker > p {
   margin-top: 4px;
@@ -2346,12 +2381,12 @@ details.lyrics-card[open] > summary {
   position: relative;
   overflow: hidden;
   padding: 28px 12px 11px;
-  border-radius: 11px;
+  border-radius: var(--r-md);
   background: var(--paper);
   color: var(--ink);
   text-align: left;
   font-family: var(--marker);
-  font-size: 1.15rem;
+  font-size: var(--fs-lead);
   line-height: 1.2;
   overflow-wrap: anywhere;
   box-shadow: 0 8px 14px -10px color-mix(in srgb, var(--shadow-ink) 90%, transparent);
@@ -2373,7 +2408,7 @@ details.lyrics-card[open] > summary {
   background: var(--c, var(--teal));
   color: var(--on, var(--ink));
   font-family: var(--display);
-  font-size: 0.6rem;
+  font-size: var(--fs-micro);
   font-weight: 800;
   letter-spacing: 0.12em;
   line-height: 1.3;
@@ -2405,10 +2440,10 @@ details.lyrics-card[open] > summary {
 .lock-action .button {
   white-space: normal;
   min-height: 56px;
-  font-size: 1.05rem;
+  font-size: var(--fs-body);
 }
 .lock-action small {
-  font-size: 0.82rem;
+  font-size: var(--fs-small);
   color: var(--muted);
 }
 .guess-locked {
@@ -2420,14 +2455,14 @@ details.lyrics-card[open] > summary {
 }
 .guess-locked .name-tag {
   flex: none;
-  font-size: 8px;
+  font-size: var(--tag-sm);
   min-width: 13em;
 }
 .locked-text strong {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 1.15rem;
+  font-size: var(--fs-lead);
 }
 .locked-text span {
   display: block;
@@ -2444,7 +2479,7 @@ details.lyrics-card[open] > summary {
   text-align: center;
 }
 .waiting-reveal h2 {
-  font-size: 1.6rem;
+  font-size: var(--fs-title);
 }
 .player-round .vote {
   grid-template-columns: 1fr 2.5ch;
@@ -2457,7 +2492,7 @@ details.lyrics-card[open] > summary {
   margin-top: 18px;
 }
 .player-round .reveal-tag {
-  font-size: 13px;
+  font-size: var(--tag-md);
 }
 .personal-result {
   --notch: 11px;
@@ -2478,7 +2513,7 @@ details.lyrics-card[open] > summary {
 }
 .personal-result strong {
   display: block;
-  font-size: 1.1rem;
+  font-size: var(--fs-lead);
 }
 .personal-result small {
   display: block;
@@ -2487,7 +2522,7 @@ details.lyrics-card[open] > summary {
 .personal-result b {
   padding-left: 16px;
   border-left: 3px dotted color-mix(in srgb, var(--ink) 40%, transparent);
-  font-size: 1.8rem;
+  font-size: var(--fs-title);
   font-weight: 800;
   font-variant-numeric: tabular-nums;
 }
@@ -2496,7 +2531,7 @@ details.lyrics-card[open] > summary {
   align-items: center;
   gap: 8px;
   margin: 26px 0 10px;
-  font-size: 1.2rem;
+  font-size: var(--fs-lead);
 }
 .player-score-title svg {
   color: var(--yellow);
@@ -2516,7 +2551,7 @@ details.lyrics-card[open] > summary {
 .player-finale .podium-place {
   flex: 1 1 0;
   min-width: 0;
-  font-size: 13px;
+  font-size: var(--tag-md);
 }
 .player-finale .podium-0 {
   order: 0;
@@ -2529,12 +2564,12 @@ details.lyrics-card[open] > summary {
   order: 2;
 }
 .player-finale .podium-place .name-tag {
-  font-size: 7px;
+  font-size: var(--tag-xs);
   min-width: 0;
   max-width: 100%;
 }
 .player-finale .podium-0 .name-tag {
-  font-size: 11px;
+  font-size: var(--tag-md);
 }
 .player-finale .standings {
   width: 100%;
@@ -2567,7 +2602,7 @@ details.lyrics-card[open] > summary {
     min-height: 220px;
   }
   .home .decoy-art .name-tag {
-    font-size: 11px;
+    font-size: var(--tag-md);
   }
   .decoy-compact {
     display: none;
@@ -2590,7 +2625,7 @@ details.lyrics-card[open] > summary {
   }
   .main-nav button {
     padding: 9px 10px;
-    font-size: 0.9rem;
+    font-size: var(--fs-small);
   }
   .main-nav svg {
     display: none;
@@ -2617,7 +2652,7 @@ details.lyrics-card[open] > summary {
     align-items: flex-start;
   }
   .editor-heading h2 {
-    font-size: 1.25rem;
+    font-size: var(--fs-subtitle);
   }
   .audio-enable {
     flex-direction: column;

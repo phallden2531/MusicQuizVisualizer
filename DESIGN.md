@@ -35,12 +35,59 @@ typography:
     fontWeight: 800
     lineHeight: 1.02
     letterSpacing: '-0.03em'
-  title:
+  phone-headline:
     fontFamily: 'Bricolage Grotesque Variable, Bricolage Grotesque, system-ui, sans-serif'
-    fontSize: '1.8rem'
+    fontSize: 'clamp(2.2rem, 10vw, 3.2rem)'
+    fontWeight: 800
+    lineHeight: 1.02
+    letterSpacing: '-0.04em'
+  stage-display:
+    fontFamily: 'Bricolage Grotesque Variable, Bricolage Grotesque, system-ui, sans-serif'
+    fontSize: 'clamp(3rem, 6vw, 7rem)'
+    fontWeight: 800
+    lineHeight: 1.02
+    letterSpacing: '-0.045em'
+  stage-headline:
+    fontFamily: 'Bricolage Grotesque Variable, Bricolage Grotesque, system-ui, sans-serif'
+    fontSize: 'clamp(2.2rem, 3.8vw, 4.8rem)'
+    fontWeight: 800
+    lineHeight: 1.02
+    letterSpacing: '-0.04em'
+  stage-title:
+    fontFamily: 'Bricolage Grotesque Variable, Bricolage Grotesque, system-ui, sans-serif'
+    fontSize: 'clamp(2rem, 2.8vw, 3.6rem)'
     fontWeight: 800
     lineHeight: 1.02
     letterSpacing: '-0.03em'
+  figure:
+    fontFamily: 'Bricolage Grotesque Variable, Bricolage Grotesque, system-ui, sans-serif'
+    fontSize: '2.5rem'
+    fontWeight: 800
+    lineHeight: 1
+    fontFeature: 'tnum'
+  heading:
+    fontFamily: 'Bricolage Grotesque Variable, Bricolage Grotesque, system-ui, sans-serif'
+    fontSize: '2.25rem'
+    fontWeight: 800
+    lineHeight: 1.02
+    letterSpacing: '-0.03em'
+  title:
+    fontFamily: 'Bricolage Grotesque Variable, Bricolage Grotesque, system-ui, sans-serif'
+    fontSize: '1.75rem'
+    fontWeight: 800
+    lineHeight: 1.02
+    letterSpacing: '-0.03em'
+  subtitle:
+    fontFamily: 'Bricolage Grotesque Variable, Bricolage Grotesque, system-ui, sans-serif'
+    fontSize: '1.375rem'
+    fontWeight: 800
+    lineHeight: 1.1
+    letterSpacing: '-0.02em'
+  lead:
+    fontFamily: 'Bricolage Grotesque Variable, Bricolage Grotesque, system-ui, sans-serif'
+    fontSize: '1.125rem'
+    fontWeight: 400
+    lineHeight: 1.55
   body:
     fontFamily: 'Bricolage Grotesque Variable, Bricolage Grotesque, system-ui, sans-serif'
     fontSize: '1rem'
@@ -48,13 +95,23 @@ typography:
     lineHeight: 1.55
   lyrics:
     fontFamily: 'Bricolage Grotesque Variable, Bricolage Grotesque, system-ui, sans-serif'
-    fontSize: '1.08rem'
+    fontSize: '1.125rem'
     fontWeight: 400
     lineHeight: 1.65
+  small:
+    fontFamily: 'Bricolage Grotesque Variable, Bricolage Grotesque, system-ui, sans-serif'
+    fontSize: '0.875rem'
+    fontWeight: 600
+    lineHeight: 1.45
   label:
     fontFamily: 'Bricolage Grotesque Variable, Bricolage Grotesque, system-ui, sans-serif'
     fontSize: '0.75rem'
     fontWeight: 700
+    letterSpacing: '0.1em'
+  micro:
+    fontFamily: 'Bricolage Grotesque Variable, Bricolage Grotesque, system-ui, sans-serif'
+    fontSize: '0.625rem'
+    fontWeight: 800
     letterSpacing: '0.1em'
   tag-hello:
     fontFamily: 'Bricolage Grotesque Variable, Bricolage Grotesque, system-ui, sans-serif'
@@ -75,16 +132,15 @@ typography:
     letterSpacing: '0.08em'
     fontFeature: 'tnum'
 rounded:
-  strip: '0.2em'
-  input: '10px'
-  ticket: '10px'
-  badge: '9px'
-  suspect: '11px'
-  button: '12px'
-  photo: '14px'
-  tag: '1em'
-  sheet: '20px'
+  xs: '4px'
+  sm: '6px'
+  md: '10px'
+  lg: '12px'
+  xl: '16px'
+  2xl: '20px'
   pill: '999px'
+  strip: '0.2em'
+  tag: '1em'
 spacing:
   xs: '8px'
   sm: '12px'
@@ -249,12 +305,14 @@ Red, teal, yellow and pink rotate in that order as the tone of guest badges, sus
 
 ### Hierarchy
 
-- **Display** (800, `clamp(2.6rem, 6.2vw, 5.4rem)`, line-height 0.98, -0.04em): home and login hero headlines. The projector scales the same role larger (lobby headline `clamp(2.2rem, 3.5vw, 4.4rem)`, finale `clamp(3rem, 6vw, 7rem)`).
-- **Headline** (800, `clamp(2.2rem, 4.4vw, 3.6rem)`, 1.02, -0.03em): host page headings, the projector song heading.
-- **Title** (800, 1.6 to 1.9rem): sheet headings, the phone's "The usual suspects", reveal captions.
-- **Body** (400, 1rem, line-height 1.55, pretty wrap): copy and notices; intros at 1.15rem, max 34em.
-- **Lyrics** (phone: 1.08rem / 1.65; projector: weight 500, line-height 1.5, fitted to the panel and balanced into columns with a navy-600 rule).
-- **Label** (700, 0.72 to 0.75rem, +0.1em tracking, written in capitals): table column headers, field hints beside a field label, metric captions.
+Every size comes from one ramp, set as `--fs-*` tokens on `:root`; nothing in the stylesheet uses a literal size. App UI steps in rem: micro 0.625, caption 0.75, small 0.875, body 1, lead 1.125, subtitle 1.375, title 1.75, heading 2.25 and figure 2.5. Headlines are fluid. The projector has its own fluid stage steps, and its smaller text is in em of `--fs-stage-base`, so the whole screen scales together.
+
+- **Display** (800, `--fs-display` `clamp(2.6rem, 6.2vw, 5.4rem)`, line-height 0.98, -0.04em): home and login hero headlines. On the projector: **Stage Display** `clamp(3rem, 6vw, 7rem)` for the finale, **Stage Headline** `clamp(2.2rem, 3.8vw, 4.8rem)` for the lobby headline, song heading and access screens, **Stage Title** `clamp(2rem, 2.8vw, 3.6rem)` for the leaderboard heading.
+- **Headline** (800, `--fs-headline` `clamp(2.2rem, 4.4vw, 3.6rem)`, 1.02, -0.03em): host page headings. **Phone Headline** `clamp(2.2rem, 10vw, 3.2rem)` is the one size for every phone h1.
+- **Heading** (800, 2.25rem): empty-state and live-room status headings. **Title** (800, 1.75rem): sheet headings, the phone's "The usual suspects", reveal captions. **Subtitle** (800, 1.375rem): last call, small section headings. **Figure** (800, 2.5rem, tabular): room codes, metrics and countdown digits in app UI.
+- **Body** (400, 1rem, line-height 1.55, pretty wrap): copy and notices. **Lead** (1.125rem): intros (max 34em), emphasised lines and marker names in lists. **Small** (0.875rem): field labels, notes, footers, status lines.
+- **Lyrics** (phone: Lead 1.125rem / 1.65; projector: weight 500, line-height 1.5, fitted to the panel and balanced into columns with a navy-600 rule).
+- **Label** (700, 0.75rem, +0.1em tracking, written in capitals): table column headers, field hints beside a field label, metric captions. **Micro** (800, 0.625rem): the printed HELLO on suspect badges and the YOU chip.
 - **Tag HELLO** (800, 3em of the tag's base size, 0.95): the word HELLO on a name tag; "my name is" below it at 650, 1.1em.
 - **Marker Name** (Permanent Marker, 2.3em of the tag's base size, 1.12): every person's name: tag strips, badges, suspects, standings, vote rows, and the brand name "Off the Record".
 - **Serial** (800, tabular numerals, `clamp(3rem, 5vw, 6rem)` on the projector, +0.08em): room codes, countdown digits and score totals.
@@ -301,7 +359,7 @@ Depth is physical: objects lie on the navy ground and cast one soft, deep shadow
 
 ## Shapes
 
-Shapes come from real stationery. Name tags have generous corners (1em of their own size) with a paper writing strip (0.2em corners) set inside. Raffle tickets have 10px corners and two semicircular notches cut from the side edges with a CSS mask (`--notch`, 9px to 22px by size), plus dotted 3 to 4px perforation lines in ink at 40% separating a serial or score. Guest badges are paper with a 9px coloured top band; suspect badges are paper with a coloured HELLO band across the top. Sheets are 20px-cornered paper; buttons 12px; inputs 10px; status badges are pills.
+Shapes come from real stationery. Name tags have generous corners (1em of their own size) with a paper writing strip (0.2em corners) set inside. Raffle tickets have 10px (`--r-md`) corners and two semicircular notches cut from the side edges with a CSS mask (`--notch`, 9px to 22px by size), plus dotted 3 to 4px perforation lines in ink at 40% separating a serial or score. Guest badges are paper with 10px corners and a 9px coloured top band; suspect badges are paper with a coloured HELLO band across the top. Corners come from one scale (`--r-*`): xs 4px, sm 6px, md 10px, lg 12px, xl 16px, 2xl 20px and pill. Sheets use 2xl; photos, upload zones, the host nav track and the sound-check banner xl; buttons, notices and song rows lg; inputs, tickets, badges and suspects md; small chips sm; progress and vote bars are pills.
 
 Tilt is part of the shape language. Tags take explicit tilts (-7 to 5 degrees through the `tilt` prop), tickets and badges small fixed tilts (about -1.2 to 2.5 degrees), and repeated badges cycle -2, 1.5 and -0.5 degrees so a row never looks machine-aligned. Small numbered marks (track numbers, how-to steps) are yellow squares tilted -3 to -4 degrees. Sheets, inputs and buttons stay straight: tools are level, ephemera is tilted.
 
@@ -311,7 +369,7 @@ Tilt is part of the shape language. Tags take explicit tilts (-7 to 5 degrees th
 
 _The HELLO my-name-is sticker; the product's central object._
 
-- **Structure:** a coloured body (default Sticker Red) with "HELLO" (Tag HELLO type) and "my name is", then a paper strip holding the name in Marker. Sizes `sm` 9px, `md` 13px, `lg` 17px, `xl` `clamp(18px, 1.9vw, 34px)` set the base, and everything inside scales in em.
+- **Structure:** a coloured body (default Sticker Red) with "HELLO" (Tag HELLO type) and "my name is", then a paper strip holding the name in Marker. The base size comes from `--tag-*` tokens and everything inside scales in em: fixed `xs` 7px, `sm` 9px, `md` 13px and `lg` 17px for phone and host, and fluid stage sizes for the projector: `stage-sm` `clamp(9px, 0.75vw, 14px)`, `stage-md` `clamp(11px, 1vw, 20px)`, `stage-lg` `clamp(14px, 1.4vw, 26px)` and `stage-xl` `clamp(18px, 1.9vw, 34px)`.
 - **Tones:** red (default, and always the true answer), teal for a decoy tag, yellow/pink for result tags.
 - **Tilt:** set per use through `--tilt`.
 - **Behaviour:** with `slap`, it plays the slap-on settle on mount. The join form puts the nickname input directly into the strip (transparent, centred, marker type). A decoy name is shown struck through with a red bar rotated -8 degrees.
@@ -327,13 +385,13 @@ _The carrier for codes and numbers._
 
 _A joined player, stuck along the bottom of the lobby._
 
-- Paper body, 9px coloured top band in the rotating tone, marker name at 1.1rem, object shadow, cycling tilt. Each badge slap-settles in as the player joins (0.55s). In the host room it carries a connection dot and a remove button.
+- Paper body, 9px coloured top band in the rotating tone, marker name at 1.125rem, object shadow, cycling tilt. Each badge slap-settles in as the player joins (0.55s). In the host room it carries a connection dot and a remove button.
 
 ### Suspect Badge
 
 _The phone's answer choice._
 
-- Paper badge with a coloured HELLO band on top, marker name at 1.15rem, 66px minimum height, alternating ±0.6 degree tilt.
+- Paper badge with a coloured HELLO band on top, marker name at 1.125rem, 66px minimum height, 10px corners, alternating ±0.6 degree tilt.
 - **Selected:** lifts 5px and tilts to -2.5 degrees with the lifted-suspect shadow and a yellow edge, plus a red check. Locking replaces the grid with a small slapped name tag.
 
 ### Buttons
@@ -355,8 +413,8 @@ _The host's working surface._
 
 - **On navy:** navy-950 fill, 1.5px navy-500 border, 10px corners, 12px 14px padding, red caret. Focus: yellow border plus a 3px yellow ring at 22%.
 - **On a sheet:** white fill, paper-line border; focus: ink border plus a 3px yellow ring at 60%.
-- **Labels:** 0.9rem weight 700, with an optional capitalised hint in Label type beside it ("HOST ONLY").
-- **Upload zones:** 14px corners, dashed paper-line border, a solid teal border and a pale teal fill once a file is in.
+- **Labels:** 0.875rem weight 700, with an optional capitalised hint in Label type beside it ("HOST ONLY").
+- **Upload zones:** 16px corners, dashed paper-line border, a solid teal border and a pale teal fill once a file is in.
 
 ### Status Badge and Notices
 
@@ -365,16 +423,16 @@ _The host's working surface._
 
 ### Navigation (host)
 
-- A navy-900 track (14px corners, 4px padding) of 10px-cornered buttons; the active one is a paper chip with ink text. Section tabs below use navy-700 for the active tab and a yellow count chip.
+- A navy-900 track (16px corners, 4px padding) of 10px-cornered buttons; the active one is a paper chip with ink text. Section tabs below use navy-700 for the active tab and a yellow count chip.
 
 ### Standings and Votes
 
 - **Standings:** rows separated by navy-600 hairlines, tabular numbers, marker names; the leader's rank is a yellow trophy, the viewing player's name is yellow, and points just added are teal. The finale on both projector and phone shows the top three as a podium of name tags (winner centred on the projector, on top on the phone), with fourth place onward listed below; a crowded projector list flows into two columns.
-- **Votes:** marker name, 12px rounded bar on paper at 10%, filled at 50% paper; the correct row turns yellow. Bars are drawn at their final width, with no animation.
+- **Votes:** marker name, 12px pill bar on paper at 10%, filled at 50% paper; the correct row turns yellow. Bars are drawn at their final width, with no animation.
 
 ### Reveal
 
-- A 4:5 photo with 14px corners and the object shadow, starting blurred at 24px and scaled to 1.08, sharpening linearly over the five-second reveal; then the red name tag with the true name slaps on, overlapping the photo's bottom edge by 2.6em.
+- A 4:5 photo with 16px corners and the object shadow, starting blurred at 24px and scaled to 1.08, sharpening linearly over the five-second reveal; then the red name tag with the true name slaps on, overlapping the photo's bottom edge by 2.6em.
 
 ### Brand
 
