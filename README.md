@@ -26,7 +26,7 @@ To test on phones, open the host page through the computer’s LAN address (for 
 6. When playback finishes, a server-controlled 15-second countdown begins. Answers close automatically. Click **Reveal the colleague** when ready: the picture sharpens over five seconds, then the name, how the room voted, and the scores appear. While a song plays, the host panel shows its title, progress, and who has locked a guess, never what they chose.
 7. Start the next song or show the final standings. A fresh room uses the current saved quiz; edits never change a game already created. **End game early** shows the final standings immediately; a song that was not yet revealed does not count.
 
-Correct guesses earn `round(1000 - 500 × min(elapsed / (audio duration + 15 seconds), 1))` points. Wrong or missing guesses earn zero. The server records submission time, excludes paused time, and acknowledges answers only after saving. Equal totals share rank. No correctness or current-round scores are sent to players before the reveal completes.
+A correct guess earns one point; a wrong or missing guess earns zero. Answer speed does not matter. Once a colleague is revealed as a song's answer, they leave the roster for the remaining songs, so each colleague can be the answer to only one song. The server acknowledges answers only after saving. Equal totals share rank. No correctness or current-round scores are sent to players before the reveal completes.
 
 ## Interruptions
 

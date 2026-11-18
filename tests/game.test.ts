@@ -11,7 +11,6 @@ import {
   resume,
   project,
   recover,
-  score,
   finishGame,
   removePlayer,
 } from '../server/game';
@@ -43,11 +42,50 @@ function playing() {
 }
 
 describe('live quiz rules', () => {
-  it('scores correct answers from 1000 to 500 and wrong answers as zero', () => {
-    expect(score(true, 0, 75000)).toBe(1000);
-    expect(score(true, 37500, 75000)).toBe(750);
-    expect(score(true, 75000, 75000)).toBe(500);
-    expect(score(false, 0, 75000)).toBe(0);
+  it('scores one point for a correct guess however late it comes, and zero otherwise', () => {
+    const game = createGame(quiz, 'ABC123', 0);
+    joinGame(game, 'early', 't1', 'Early');
+    joinGame(game, 'late', 't2', 'Late');
+    joinGame(game, 'wrong', 't3', 'Wrong');
+    startRound(game, 1000);
+    submitAnswer(game, 'early', 'sam', 1000);
+    submitAnswer(game, 'wrong', 'alex', 1000);
+    endAudio(game, 61000, game.runId);
+    submitAnswer(game, 'late', 'sam', 75999);
+    advance(game, 76000);
+    reveal(game, 80000);
+    advance(game, 85000);
+    const standings = project(game, 'screen', undefined, 85000).standings;
+    expect(standings.map((p) => [p.name, p.score, p.rank])).toEqual([
+      ['Early', 1, 1],
+      ['Late', 1, 1],
+      ['Wrong', 0, 3],
+    ]);
+  });
+  it('drops a revealed colleague from the roster for the following songs', () => {
+    const twoSongs = structuredClone(quiz);
+    twoSongs.colleagues.push({ id: 'jo', name: 'Jo' });
+    twoSongs.songs.push({ ...twoSongs.songs[0], id: 'song2', correctColleagueId: 'alex' });
+    const game = createGame(twoSongs, 'ABC123', 0);
+    joinGame(game, 'p1', 't1', 'One');
+    startRound(game, 1000);
+    const ids = () => project(game, 'player', 'p1', 1000).colleagues.map((c) => c.id);
+    expect(ids()).toEqual(['alex', 'sam', 'jo']);
+    endAudio(game, 61000, game.runId);
+    advance(game, 76000);
+    reveal(game, 80000);
+    expect(ids()).toEqual(['alex', 'sam', 'jo']);
+    advance(game, 85000);
+    expect(ids()).toEqual(['alex', 'jo']);
+    startRound(game, 90000);
+    expect(ids()).toEqual(['alex', 'jo']);
+    expect(() => submitAnswer(game, 'p1', 'sam', 91000)).toThrow(/from the list/i);
+    submitAnswer(game, 'p1', 'alex', 91000);
+  });
+  it('refuses a game where one colleague answers two songs', () => {
+    const repeat = structuredClone(quiz);
+    repeat.songs.push({ ...repeat.songs[0], id: 'song2' });
+    expect(() => createGame(repeat, 'ABC123', 0)).toThrow(/only one song/i);
   });
   it('locks answers exactly 15 seconds after the audio actually ends', () => {
     const game = playing();
@@ -84,7 +122,7 @@ describe('live quiz rules', () => {
     expect(project(game, 'screen', undefined, 81000).correctName).toBeUndefined();
     advance(game, 85000);
     expect(project(game, 'player', 'p1', 85000).correctName).toBe('Sam');
-    expect(project(game, 'player', 'p1', 85000).standings[0].score).toBe(1000);
+    expect(project(game, 'player', 'p1', 85000).standings[0].score).toBe(1);
   });
   it('freezes scoring and rejects answers while paused, and invalidates old playback events', () => {
     const game = playing();
@@ -179,7 +217,7 @@ describe('live quiz rules', () => {
     reveal(game, 80000);
     advance(game, 85000);
     finishGame(game);
-    expect(project(game, 'player', 'p1', 86000).standings[0].score).toBe(1000);
+    expect(project(game, 'player', 'p1', 86000).standings[0].score).toBe(1);
   });
   it('lets the host remove a player only before the first song', () => {
     const game = createGame(quiz, 'ABC123', 0);

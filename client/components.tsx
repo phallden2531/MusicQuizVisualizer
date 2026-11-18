@@ -193,7 +193,10 @@ export function Podium({ standings, playerId }: { standings: Standing[]; playerI
           </NameTag>
           <strong>
             {p.score.toLocaleString()}
-            <small>POINTS{p.id === playerId && ' · YOU'}</small>
+            <small>
+              {p.score === 1 ? 'POINT' : 'POINTS'}
+              {p.id === playerId && ' · YOU'}
+            </small>
           </strong>
         </div>
       ))}

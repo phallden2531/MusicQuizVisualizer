@@ -29,6 +29,11 @@ export function createGame(quiz: Quiz, roomCode: string, now: number): Game {
       'Choose the correct colleague for every song.',
     );
   }
+  // A revealed colleague leaves the roster, so nobody can be the answer twice.
+  requireRule(
+    new Set(quiz.songs.map((s) => s.correctColleagueId)).size === quiz.songs.length,
+    'Each colleague can be the answer to only one song.',
+  );
   return {
     roomCode,
     quiz: structuredClone(quiz),
@@ -126,7 +131,7 @@ export function submitAnswer(game: Game, playerId: string, colleagueId: string, 
     401,
   );
   requireRule(
-    game.quiz.colleagues.some((c) => c.id === colleagueId),
+    candidates(game).some((c) => c.id === colleagueId),
     'Choose a colleague from the list.',
   );
   requireRule(!game.answers[game.roundIndex][playerId], 'You already locked an answer.');
@@ -189,8 +194,16 @@ export function finishGame(game: Game) {
   game.deadline = null;
   game.revealEndsAt = null;
 }
-export function score(correct: boolean, elapsedMs: number, totalMs: number) {
-  return correct ? Math.round(1000 - 500 * Math.min(1, Math.max(0, elapsedMs / totalMs))) : 0;
+/** The last round whose answer the room has seen. */
+function lastRevealed(game: Game) {
+  return ['results', 'finished'].includes(game.phase) ? game.roundIndex : game.roundIndex - 1;
+}
+/** Colleagues still in the running: everyone not yet revealed as an answer. */
+function candidates(game: Game) {
+  const revealed = new Set(
+    game.quiz.songs.slice(0, lastRevealed(game) + 1).map((s) => s.correctColleagueId),
+  );
+  return game.quiz.colleagues.filter((c) => !revealed.has(c.id));
 }
 function votes(game: Game): Vote[] {
   const song = game.quiz.songs[game.roundIndex];
@@ -208,9 +221,7 @@ function votes(game: Game): Vote[] {
     .sort((a, b) => b.count - a.count || Number(b.correct) - Number(a.correct));
 }
 function standings(game: Game): Standing[] {
-  const lastVisible = ['results', 'finished'].includes(game.phase)
-    ? game.roundIndex
-    : game.roundIndex - 1;
+  const lastVisible = lastRevealed(game);
   const list = game.players
     .map((player) => {
       let total = 0;
@@ -218,13 +229,7 @@ function standings(game: Game): Standing[] {
       for (let i = 0; i <= lastVisible; i++) {
         const answer = game.answers[i]?.[player.id];
         const song = game.quiz.songs[i];
-        const points = answer
-          ? score(
-              answer.colleagueId === song.correctColleagueId,
-              answer.elapsedMs,
-              song.durationMs + 15000,
-            )
-          : 0;
+        const points = answer?.colleagueId === song.correctColleagueId ? 1 : 0;
         total += points;
         if (i === game.roundIndex) roundPoints = points;
       }
@@ -254,7 +259,7 @@ export function project(
     paused: game.paused,
     pauseReason: game.pauseReason,
     serverNow: now,
-    colleagues: game.quiz.colleagues,
+    colleagues: candidates(game),
     players: game.players.map((p) => ({
       id: p.id,
       name: p.name,

@@ -23,9 +23,12 @@ export function Studio({
   const song = quiz.songs[selected];
   const readyCount = quiz.songs.filter(songReady).length;
   const allReady = quiz.songs.length > 0 && readyCount === quiz.songs.length;
+  const answersUnique =
+    new Set(quiz.songs.map((s) => s.correctColleagueId)).size === quiz.songs.length;
   const canCreate =
     !dirty &&
     allReady &&
+    answersUnique &&
     quiz.colleagues.length >= 2 &&
     (!game || game.phase === 'lobby' || game.phase === 'finished');
   function addSong() {
@@ -60,7 +63,9 @@ export function Studio({
       ? 'Add at least two colleagues to the lineup before creating a live room.'
       : quiz.songs.length > 0 && !allReady
         ? 'Every song needs a title, audio, a picture, lyrics and the correct colleague.'
-        : '';
+        : !answersUnique
+          ? 'Each colleague can be the answer to only one song, since revealed colleagues leave the roster.'
+          : '';
   return (
     <main className="studio">
       <div className="studio-heading">

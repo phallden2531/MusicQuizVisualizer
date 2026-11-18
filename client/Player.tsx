@@ -299,7 +299,7 @@ export function Player({ roomCode }: { roomCode: string }) {
                         <LockKeyhole size={16} />
                         {selectedName ? `Lock in ${selectedName}` : 'Pick a colleague below'}
                       </button>
-                      <small>One shot per song. Earlier correct guesses earn more.</small>
+                      <small>One shot per song. One point if you’re right.</small>
                     </div>
                   )}
                   {state.phase === 'locked' && (

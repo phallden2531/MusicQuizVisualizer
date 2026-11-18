@@ -233,9 +233,9 @@ describe('live transport', () => {
       ),
     ).toBe(true);
     expect(results.filter((result) => result.data.myResult.correct)).toHaveLength(8);
-    expect(
-      results[0].data.standings.filter((p: { score: number }) => p.score === 1000),
-    ).toHaveLength(8);
+    expect(results[0].data.standings.filter((p: { score: number }) => p.score === 1)).toHaveLength(
+      8,
+    );
   });
   it('keeps private media and host roles inaccessible to players', async () => {
     const { room, quiz } = await prepare();
