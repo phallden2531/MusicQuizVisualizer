@@ -29,7 +29,7 @@ The songs are written about the people in the room. The answer is always a colle
 ## Capabilities and Constraints
 
 - Max 15 players, one host, one game, one presentation at a time. No accounts; nickname only. Players join only in the lobby.
-- English UI. Full (not timed) lyrics. Five-second reveal. Scoring 1000→500 linear over song + grace.
+- English UI. Full (not timed) lyrics. Five-second reveal. Scoring: one point per correct guess, no speed bonus. A revealed colleague leaves the roster.
 - Correctness is never shown to players before the reveal; the host panel never shows what anyone chose.
 - React + TypeScript (Vite), Socket.IO, Node/Express server, Azure App Service + Blob Storage.
 

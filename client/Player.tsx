@@ -182,7 +182,7 @@ export function Player({ roomCode }: { roomCode: string }) {
                 <ol>
                   <li>Listen & read the lyrics</li>
                   <li>Choose the real colleague</li>
-                  <li>Lock your guess. Earlier earns more.</li>
+                  <li>Lock your guess. One point if you’re right.</li>
                 </ol>
               </section>
             </main>
