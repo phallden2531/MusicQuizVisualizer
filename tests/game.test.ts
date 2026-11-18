@@ -78,6 +78,22 @@ describe('live quiz rules', () => {
     expect(() => submitAnswer(game, 'p1', 'sam', 91000)).toThrow(/from the list/i);
     submitAnswer(game, 'p1', 'alex', 91000);
   });
+  it('schedules the next song ten seconds into the results, but not after the last song', () => {
+    const twoSongs = structuredClone(quiz);
+    twoSongs.songs.push({ ...twoSongs.songs[0], id: 'song2', correctColleagueId: 'alex' });
+    const game = createGame(twoSongs, 'ABC123', 0);
+    joinGame(game, 'p1', 't1', 'One');
+    startRound(game, 1000);
+    endAudio(game, 80000, game.runId);
+    advance(game, 86000);
+    expect(project(game, 'player', 'p1', 86000).nextRoundAt).toBe(95000);
+    startRound(game, 95000);
+    expect(game.nextRoundAt).toBeNull();
+    endAudio(game, 160000, game.runId);
+    advance(game, 165000);
+    expect(game.phase).toBe('results');
+    expect(game.nextRoundAt).toBeNull();
+  });
   it('refuses a game where one colleague answers two songs', () => {
     const repeat = structuredClone(quiz);
     repeat.songs.push({ ...repeat.songs[0], id: 'song2' });

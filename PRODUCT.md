@@ -23,7 +23,7 @@ The songs are written about the people in the room. The answer is always a colle
 ## Operating Context
 
 - Three views: host (studio for preparation + live room control), presentation (projector, audio, QR code), player (phone).
-- Flow per song: host starts → song plays on the room speakers → phones show full lyrics and the roster → players lock one guess → when the song ends (or the host ends the round once everyone has guessed) a five-second blurred-photo reveal starts → name, room votes, scores → next song or final standings.
+- Flow per song: host starts → song plays on the room speakers → phones show full lyrics and the roster → players lock one guess → when the song ends (or the host ends the round once everyone has guessed) a five-second blurred-photo reveal starts → name, room votes, scores → next song starts by itself after ten seconds, or the host shows the final standings.
 - Interruptions pause the round; host resumes explicitly.
 
 ## Capabilities and Constraints

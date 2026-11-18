@@ -1,6 +1,8 @@
 import { randomUUID } from 'node:crypto';
 import type { Game, GameView, Quiz, Role, Standing, Vote } from '../shared/types.js';
 
+/** How long the votes and leaderboard stay up before the next song starts. */
+export const RESULTS_MS = 10000;
 export class RuleError extends Error {
   constructor(
     message: string,
@@ -49,6 +51,7 @@ export function createGame(quiz: Quiz, roomCode: string, now: number): Game {
     clockAt: null,
     playbackPositionMs: 0,
     revealEndsAt: null,
+    nextRoundAt: null,
     heartbeatAt: now,
   };
 }
@@ -91,6 +94,7 @@ export function startRound(game: Game, now: number) {
   game.clockAt = now;
   game.playbackPositionMs = 0;
   game.revealEndsAt = null;
+  game.nextRoundAt = null;
   game.heartbeatAt = now;
   game.answers[game.roundIndex] = {};
 }
@@ -123,6 +127,9 @@ export function advance(game: Game, now: number): boolean {
   if (game.paused) return false;
   if (game.phase === 'revealing' && game.revealEndsAt !== null && now >= game.revealEndsAt) {
     game.phase = 'results';
+    // The final standings wait for the host; every other song follows on its own.
+    game.nextRoundAt =
+      game.roundIndex + 1 < game.quiz.songs.length ? game.revealEndsAt + RESULTS_MS : null;
     return true;
   }
   return false;
@@ -192,6 +199,7 @@ export function finishGame(game: Game) {
   game.pauseReason = null;
   game.clockAt = null;
   game.revealEndsAt = null;
+  game.nextRoundAt = null;
 }
 /** The last round whose answer the room has seen. */
 function lastRevealed(game: Game) {
@@ -268,6 +276,7 @@ export function project(
     answerCount: Object.keys(game.answers[game.roundIndex] ?? {}).length,
     standings: standings(game),
     revealEndsAt: game.revealEndsAt,
+    nextRoundAt: game.nextRoundAt ?? null,
   };
   if (playerId) view.playerId = playerId;
   if (song && game.phase !== 'finished') view.lyrics = song.lyrics;

@@ -89,6 +89,32 @@ describe('serialized game service', () => {
     expect(service.state.game!.answers[0][player.id].elapsedMs).toBe(59999);
     expect(service.state.game!.phase).toBe('revealing');
   });
+  it('starts the next song by itself once the results have been up long enough', async () => {
+    let now = 1000;
+    const service = await QuizService.open(new MemoryStore(), () => now);
+    await service.saveQuiz({
+      ...fixture,
+      songs: [...fixture.songs, { ...fixture.songs[0], id: 'song2', correctColleagueId: 'alex' }],
+    });
+    const game = await service.newGame();
+    await service.join(game.roomCode, 'Alice');
+    service.attachScreen('screen');
+    service.markReady('screen', 'song', 60000);
+    await service.command('start', 'start', game.runId);
+    now = 61000;
+    await service.playback('screen', 'ended', service.state.game!.runId, 60000);
+    now = 66000;
+    await service.tick();
+    expect(service.state.game!.phase).toBe('results');
+    now = 76000;
+    await service.tick();
+    // The presentation has not loaded the next song yet, so it keeps waiting.
+    expect(service.state.game!.phase).toBe('results');
+    service.markReady('screen', 'song2', 60000);
+    await service.tick();
+    expect(service.state.game!.phase).toBe('playing');
+    expect(service.state.game!.roundIndex).toBe(1);
+  });
   it('pauses when audio position stops advancing despite continued transport heartbeats', async () => {
     let now = 1000;
     const service = await QuizService.open(new MemoryStore(), () => now);

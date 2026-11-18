@@ -42,6 +42,8 @@ export interface Game {
   clockAt: number | null;
   playbackPositionMs: number;
   revealEndsAt: number | null;
+  /** When the next song starts by itself; null when the host decides. Absent in older saves. */
+  nextRoundAt?: number | null;
   heartbeatAt: number;
 }
 export interface Standing {
@@ -76,6 +78,7 @@ export interface GameView {
   myResult?: { correct: boolean; points: number };
   playerId?: string;
   revealEndsAt: number | null;
+  nextRoundAt: number | null;
   imageUrl?: string;
   correctName?: string;
   audioUrl?: string;

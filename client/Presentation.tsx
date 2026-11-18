@@ -12,6 +12,7 @@ import {
   QR,
   Reveal,
   RoundTag,
+  secondsUntil,
   Standings,
   Ticket,
   tones,
@@ -22,7 +23,7 @@ import { useGame, useNow } from './useGame';
 export function Presentation({ roomCode }: { roomCode: string }) {
   const live = useGame('screen', roomCode);
   const { state, emit, connected } = live;
-  const now = useNow(live.offset, state?.phase === 'revealing');
+  const now = useNow(live.offset, state?.phase === 'revealing' || state?.phase === 'results');
   const [enabled, setEnabled] = useState(false);
   const [error, setError] = useState('');
   const [loaded, setLoaded] = useState(false);
@@ -257,7 +258,9 @@ export function Presentation({ roomCode }: { roomCode: string }) {
               <div className="screen-round-bar">
                 <RoundTag state={state} />
                 <span>
-                  {state.answerCount} OF {state.players.length} GUESSES LOCKED
+                  {state.phase === 'results' && state.nextRoundAt
+                    ? `NEXT SONG IN ${secondsUntil(state.nextRoundAt, now)}`
+                    : `${state.answerCount} OF ${state.players.length} GUESSES LOCKED`}
                 </span>
               </div>
               {state.phase === 'playing' ? (

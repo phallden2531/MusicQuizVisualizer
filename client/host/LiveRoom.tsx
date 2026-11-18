@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import type { GameView } from '../../shared/types';
 import { api } from '../api';
-import { Badge, QR, Standings, Ticket, tones, Votes } from '../components';
+import { Badge, QR, secondsUntil, Standings, Ticket, tones, Votes } from '../components';
 
 const clock = (ms: number) =>
   `${Math.floor(ms / 60000)}:${String(Math.floor(ms / 1000) % 60).padStart(2, '0')}`;
@@ -118,6 +118,10 @@ export function LiveRoom({
                 {game.nextSongTitle
                   ? `Next up: ${game.nextSongTitle}`
                   : 'That was the final song. Time for the podium.'}
+                {game.nextRoundAt &&
+                  (secondsUntil(game.nextRoundAt, now) > 0
+                    ? `. Starts by itself in ${secondsUntil(game.nextRoundAt, now)} s.`
+                    : '. Starts as soon as the presentation is ready.')}
               </p>
             ) : null}
             {inRound && game.currentSongTitle && (
@@ -196,7 +200,7 @@ export function LiveRoom({
               >
                 <ArrowRight size={17} />
                 {game.roundIndex + 1 < game.totalRounds
-                  ? 'Start next song'
+                  ? 'Start next song now'
                   : 'Show final standings'}
               </button>
             ) : game.phase === 'playing' ? (

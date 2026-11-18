@@ -21,7 +21,7 @@ export function Host() {
   const game = live.state ?? initialGame;
   const now = useNow(
     live.offset,
-    tab === 'live' && ['playing', 'revealing'].includes(game?.phase ?? ''),
+    tab === 'live' && ['playing', 'revealing', 'results'].includes(game?.phase ?? ''),
   );
   async function loadHost() {
     const data = await api<{ quiz: Quiz; game: GameView | null }>('/api/host');

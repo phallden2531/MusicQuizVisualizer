@@ -174,10 +174,12 @@ export class QuizService extends EventEmitter {
     }));
     if (role === 'host') {
       view.screenConnected = this.screenId !== null;
-      view.screenReady =
-        this.readySongId === this.expectedAudioSong()?.id && this.screenId !== null;
+      view.screenReady = this.screenReady();
     }
     return view;
+  }
+  private screenReady() {
+    return this.screenId !== null && this.readySongId === this.expectedAudioSong()?.id;
   }
   expectedAudioSong() {
     const game = this.state.game;
@@ -229,17 +231,14 @@ export class QuizService extends EventEmitter {
       if (command === 'start') {
         const isFinal = game.phase === 'results' && game.roundIndex + 1 === game.quiz.songs.length;
         if (!isFinal) {
-          requireRule(
-            this.screenId && this.readySongId === this.expectedAudioSong()?.id,
-            'Open the presentation screen and enable audio first.',
-          );
+          requireRule(this.screenReady(), 'Open the presentation screen and enable audio first.');
           requireRule(game.players.length > 0, 'Wait for at least one player to join.');
         }
         startRound(game, now);
       } else if (command === 'pause') pause(game, now, 'Paused by the host.');
       else if (command === 'resume') {
         requireRule(
-          this.screenId && this.readySongId === this.expectedAudioSong()?.id,
+          this.screenReady(),
           'Reconnect the presentation screen and enable audio first.',
         );
         resume(game, now);
@@ -301,7 +300,20 @@ export class QuizService extends EventEmitter {
     const timedTransition =
       game.phase === 'revealing' && game.revealEndsAt !== null && now >= game.revealEndsAt;
     const stalled = game.phase === 'playing' && now - game.heartbeatAt > STALL_MS;
-    if (timedTransition || stalled)
+    // Without a ready presentation the next song waits for the host instead.
+    const nextSongDue =
+      game.phase === 'results' &&
+      game.nextRoundAt != null &&
+      now >= game.nextRoundAt &&
+      this.screenReady() &&
+      game.players.length > 0;
+    if (nextSongDue)
+      await this.mutate((state, currentNow) => {
+        const live = state.game!;
+        if (live.phase === 'results' && live.nextRoundAt != null && currentNow >= live.nextRoundAt)
+          startRound(live, currentNow);
+      });
+    else if (timedTransition || stalled)
       await this.mutate((state, currentNow) => {
         const live = state.game!;
         advance(live, currentNow);

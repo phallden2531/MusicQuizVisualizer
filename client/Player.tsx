@@ -20,6 +20,7 @@ import {
   Podium,
   Reveal,
   RoundTag,
+  secondsUntil,
   Standings,
   Ticket,
   tones,
@@ -45,7 +46,7 @@ export function Player({ roomCode }: { roomCode: string }) {
   const [selected, setSelected] = useState('');
   const live = useGame('player', roomCode, identity?.token, Boolean(identity));
   const state = live.state;
-  const now = useNow(live.offset, state?.phase === 'revealing');
+  const now = useNow(live.offset, state?.phase === 'revealing' || state?.phase === 'results');
   useEffect(() => {
     setSelected('');
     setSearch('');
@@ -331,7 +332,11 @@ export function Player({ roomCode }: { roomCode: string }) {
                         <Trophy size={17} /> The room so far
                       </h3>
                       <Standings standings={state.standings} playerId={identity.id} />
-                      <p className="next-song-note">The host will take it from here.</p>
+                      <p className="next-song-note">
+                        {state.nextRoundAt
+                          ? `Next song in ${secondsUntil(state.nextRoundAt, now)} seconds.`
+                          : 'The host will take it from here.'}
+                      </p>
                     </>
                   )}
                 </>

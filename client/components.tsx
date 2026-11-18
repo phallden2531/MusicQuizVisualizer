@@ -203,6 +203,8 @@ export function Podium({ standings, playerId }: { standings: Standing[]; playerI
     </div>
   );
 }
+/** Whole seconds left until a server timestamp, never negative. */
+export const secondsUntil = (at: number, now: number) => Math.max(0, Math.ceil((at - now) / 1000));
 /** A trophy means something only once somebody has actually scored. */
 export const leads = (p: Standing) => p.rank === 1 && p.score > 0;
 export function RoundTag({ state }: { state: GameView }) {
