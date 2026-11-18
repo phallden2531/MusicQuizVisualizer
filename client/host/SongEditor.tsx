@@ -164,7 +164,7 @@ export function SongEditor({
           <Volume2 size={14} />
           Audio plays on the room screen only.
         </span>
-        <span>Answers close 15 seconds after the song.</span>
+        <span>Answers close when the song ends.</span>
       </div>
     </section>
   );

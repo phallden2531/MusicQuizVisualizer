@@ -58,7 +58,7 @@ async function startedGame(clock: () => number, storage = new MemoryStore()) {
   return { service, storage, game, player, runId: service.state.game!.runId };
 }
 describe('serialized game service', () => {
-  it('accepts a guess received before the deadline even when earlier writes delay processing', async () => {
+  it('accepts a guess received before the song ends even when earlier writes delay processing', async () => {
     let now = 1000;
     const storage = new MemoryStore();
     const service = await QuizService.open(storage, () => now);
@@ -69,25 +69,25 @@ describe('serialized game service', () => {
     service.markReady('screen', 'song', 60000);
     await service.command('start', 'start', game.runId);
     const runId = service.state.game!.runId;
-    now = 61000;
-    await service.playback('screen', 'ended', runId, 60000);
     let release!: () => void;
     const gate = new Promise<void>((resolve) => {
       release = resolve;
     });
     storage.beforeWrite = () => gate;
-    now = 75000;
+    now = 59000;
     const earlierWrite = service.saveQuiz(fixture);
     await new Promise((resolve) => setImmediate(resolve));
-    now = 75999;
+    now = 60999;
     const answer = service.answer(game.roomCode, player.token, 'sam', runId);
-    now = 78000;
+    now = 61000;
+    const ended = service.playback('screen', 'ended', runId, 60000);
+    now = 63000;
     release();
     await earlierWrite;
     await expect(answer).resolves.toBeUndefined();
-    expect(service.state.game!.answers[0][player.id].elapsedMs).toBe(74999);
-    await service.tick();
-    expect(service.state.game!.phase).toBe('locked');
+    await ended;
+    expect(service.state.game!.answers[0][player.id].elapsedMs).toBe(59999);
+    expect(service.state.game!.phase).toBe('revealing');
   });
   it('pauses when audio position stops advancing despite continued transport heartbeats', async () => {
     let now = 1000;
@@ -146,11 +146,8 @@ describe('serialized game service', () => {
     await expect(service.command('pause', 'two', game.runId)).rejects.toThrow(/changed/i);
     now = 61000;
     await service.playback('screen1', 'ended', runId, 60000);
-    now = 76000;
-    await service.tick();
-    expect(service.state.game!.phase).toBe('locked');
-    await service.command('reveal', 'three', runId);
-    now = 81000;
+    expect(service.state.game!.phase).toBe('revealing');
+    now = 66000;
     await service.tick();
     expect(service.state.game!.phase).toBe('results');
   });

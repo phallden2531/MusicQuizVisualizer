@@ -14,7 +14,6 @@ import { api, json } from './api';
 import {
   Brand,
   ConnectionNotice,
-  Countdown,
   Equalizer,
   ErrorNotice,
   NameTag,
@@ -46,7 +45,7 @@ export function Player({ roomCode }: { roomCode: string }) {
   const [selected, setSelected] = useState('');
   const live = useGame('player', roomCode, identity?.token, Boolean(identity));
   const state = live.state;
-  const now = useNow(live.offset, state?.phase === 'grace' || state?.phase === 'revealing');
+  const now = useNow(live.offset, state?.phase === 'revealing');
   useEffect(() => {
     setSelected('');
     setSearch('');
@@ -85,10 +84,8 @@ export function Player({ roomCode }: { roomCode: string }) {
     localStorage.removeItem(key);
     setIdentity(null);
   }
-  const answering = state && ['playing', 'grace'].includes(state.phase);
+  const answering = state?.phase === 'playing';
   const canPick = answering && !state.myAnswer;
-  // In the last call the guess matters more than rereading; fold the lyrics away.
-  const lastCall = canPick && state.phase === 'grace';
   const lockedName = state?.colleagues.find((c) => c.id === state.myAnswer?.colleagueId)?.name;
   const selectedName = state?.colleagues.find((c) => c.id === selected)?.name;
   return (
@@ -221,8 +218,7 @@ export function Player({ roomCode }: { roomCode: string }) {
                   </span>
                 </div>
               )}
-              <Countdown state={state} now={now} />
-              {answering || state.phase === 'locked' ? (
+              {answering ? (
                 <>
                   <div className="player-round-heading">
                     <h1>
@@ -231,10 +227,10 @@ export function Player({ roomCode }: { roomCode: string }) {
                       really about?
                     </h1>
                   </div>
-                  <details className="lyrics-card" open={!lastCall} key={String(lastCall)}>
+                  <details className="lyrics-card" open>
                     <summary className="lyrics-label">
                       <Music2 size={14} />
-                      {lastCall ? 'SHOW THE LYRICS AGAIN' : 'THE LYRICS'}
+                      THE LYRICS
                     </summary>
                     <div className="lyrics-text">{state.lyrics}</div>
                   </details>
@@ -249,11 +245,6 @@ export function Player({ roomCode }: { roomCode: string }) {
                         </strong>
                         <span>{lockedName} is on your record.</span>
                       </div>
-                    </div>
-                  ) : state.phase === 'locked' ? (
-                    <div className="notice">
-                      <LockKeyhole size={18} />
-                      <span>The answering window has closed.</span>
                     </div>
                   ) : (
                     <section className="answer-picker">
@@ -300,12 +291,6 @@ export function Player({ roomCode }: { roomCode: string }) {
                         {selectedName ? `Lock in ${selectedName}` : 'Pick a colleague below'}
                       </button>
                       <small>One shot per song. One point if you’re right.</small>
-                    </div>
-                  )}
-                  {state.phase === 'locked' && (
-                    <div className="waiting-reveal">
-                      <h2>Waiting for the big reveal</h2>
-                      <p className="muted">The host has one more secret to share.</p>
                     </div>
                   )}
                 </>

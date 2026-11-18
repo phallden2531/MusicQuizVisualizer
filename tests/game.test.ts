@@ -6,7 +6,7 @@ import {
   endAudio,
   submitAnswer,
   advance,
-  reveal,
+  endRound,
   pause,
   resume,
   project,
@@ -50,10 +50,8 @@ describe('live quiz rules', () => {
     startRound(game, 1000);
     submitAnswer(game, 'early', 'sam', 1000);
     submitAnswer(game, 'wrong', 'alex', 1000);
-    endAudio(game, 61000, game.runId);
-    submitAnswer(game, 'late', 'sam', 75999);
-    advance(game, 76000);
-    reveal(game, 80000);
+    submitAnswer(game, 'late', 'sam', 79999);
+    endAudio(game, 80000, game.runId);
     advance(game, 85000);
     const standings = project(game, 'screen', undefined, 85000).standings;
     expect(standings.map((p) => [p.name, p.score, p.rank])).toEqual([
@@ -71,9 +69,7 @@ describe('live quiz rules', () => {
     startRound(game, 1000);
     const ids = () => project(game, 'player', 'p1', 1000).colleagues.map((c) => c.id);
     expect(ids()).toEqual(['alex', 'sam', 'jo']);
-    endAudio(game, 61000, game.runId);
-    advance(game, 76000);
-    reveal(game, 80000);
+    endAudio(game, 80000, game.runId);
     expect(ids()).toEqual(['alex', 'sam', 'jo']);
     advance(game, 85000);
     expect(ids()).toEqual(['alex', 'jo']);
@@ -87,15 +83,31 @@ describe('live quiz rules', () => {
     repeat.songs.push({ ...repeat.songs[0], id: 'song2' });
     expect(() => createGame(repeat, 'ABC123', 0)).toThrow(/only one song/i);
   });
-  it('locks answers exactly 15 seconds after the audio actually ends', () => {
+  it('closes answers and starts the reveal as soon as the audio ends', () => {
     const game = playing();
     endAudio(game, 62000, game.runId);
-    expect(game.phase).toBe('grace');
-    expect(game.deadline).toBe(77000);
-    submitAnswer(game, 'p1', 'sam', 76999);
-    expect(game.answers[0].p1.colleagueId).toBe('sam');
-    advance(game, 77000);
-    expect(game.phase).toBe('locked');
+    expect(game.phase).toBe('revealing');
+    expect(game.revealEndsAt).toBe(67000);
+    expect(() => submitAnswer(game, 'p1', 'sam', 62001)).toThrow(/closed/i);
+    advance(game, 67000);
+    expect(game.phase).toBe('results');
+  });
+  it('lets the host end the round early only once every player has guessed', () => {
+    const game = createGame(quiz, 'ABC123', 0);
+    joinGame(game, 'p1', 't1', 'Player One');
+    joinGame(game, 'p2', 't2', 'Player Two');
+    startRound(game, 1000);
+    submitAnswer(game, 'p1', 'sam', 2000);
+    expect(() => endRound(game, 3000)).toThrow(/everyone/i);
+    submitAnswer(game, 'p2', 'alex', 4000);
+    pause(game, 5000, 'Paused by the host.');
+    expect(() => endRound(game, 6000)).toThrow(/resume/i);
+    resume(game, 7000);
+    endRound(game, 8000);
+    expect(game.phase).toBe('revealing');
+    expect(game.revealEndsAt).toBe(13000);
+    endAudio(game, 9000, game.runId);
+    expect(game.revealEndsAt).toBe(13000);
   });
   it('rejects late and repeat guesses even if the timer has not ticked yet', () => {
     const game = playing();
@@ -103,7 +115,7 @@ describe('live quiz rules', () => {
     expect(() => submitAnswer(game, 'p1', 'alex', 3000)).toThrow(/already/i);
     const late = playing();
     endAudio(late, 61000, late.runId);
-    expect(() => submitAnswer(late, 'p1', 'sam', 76000)).toThrow(/closed/i);
+    expect(() => submitAnswer(late, 'p1', 'sam', 61000)).toThrow(/closed/i);
   });
   it('withholds answer, picture, other guesses, and current-round scores until reveal completes', () => {
     const game = playing();
@@ -115,9 +127,7 @@ describe('live quiz rules', () => {
     expect(snapshot.correctName).toBeUndefined();
     expect(snapshot.standings[0].score).toBe(0);
     expect(snapshot.myAnswer).toEqual({ colleagueId: 'sam' });
-    endAudio(game, 61000, game.runId);
-    advance(game, 76000);
-    reveal(game, 80000);
+    endAudio(game, 80000, game.runId);
     expect(project(game, 'screen', undefined, 81000).imageUrl).toContain('/image');
     expect(project(game, 'screen', undefined, 81000).correctName).toBeUndefined();
     advance(game, 85000);
@@ -136,16 +146,12 @@ describe('live quiz rules', () => {
     submitAnswer(game, 'p1', 'sam', 101000);
     expect(game.answers[0].p1.elapsedMs).toBe(10000);
   });
-  it('preserves the remainder of the grace period over pause and resume', () => {
+  it('moves a game saved mid-countdown by an older version straight into the reveal', () => {
     const game = playing();
-    endAudio(game, 61000, game.runId);
-    pause(game, 66000, 'Screen disconnected');
-    resume(game, 100000);
-    expect(game.deadline).toBe(110000);
-    advance(game, 109999);
-    expect(game.phase).toBe('grace');
-    advance(game, 110000);
-    expect(game.phase).toBe('locked');
+    (game as { phase: string }).phase = 'grace';
+    recover(game, 50000);
+    expect(game.phase).toBe('revealing');
+    expect(game.revealEndsAt).toBe(55000);
   });
   it('keeps the game snapshot separate from later editor changes', () => {
     const draft = structuredClone(quiz);
@@ -174,9 +180,7 @@ describe('live quiz rules', () => {
     joinGame(game, 'p1', 't1', 'One');
     joinGame(game, 'p2', 't2', 'Two');
     startRound(game, 1000);
-    endAudio(game, 61000, game.runId);
-    advance(game, 76000);
-    reveal(game, 80000);
+    endAudio(game, 80000, game.runId);
     advance(game, 85000);
     const standings = project(game, 'screen', undefined, 85000).standings;
     expect(standings.map((p) => p.rank)).toEqual([1, 1]);
@@ -185,9 +189,7 @@ describe('live quiz rules', () => {
   });
   it('stops offering audio to the presentation once the game has finished', () => {
     const game = playing();
-    endAudio(game, 61000, game.runId);
-    advance(game, 76000);
-    reveal(game, 80000);
+    endAudio(game, 80000, game.runId);
     advance(game, 85000);
     startRound(game, 90000);
     const view = project(game, 'screen', undefined, 90000);
@@ -212,9 +214,7 @@ describe('live quiz rules', () => {
   it('keeps completed rounds when the host ends the game after a result', () => {
     const game = playing();
     submitAnswer(game, 'p1', 'sam', 1000);
-    endAudio(game, 61000, game.runId);
-    advance(game, 76000);
-    reveal(game, 80000);
+    endAudio(game, 80000, game.runId);
     advance(game, 85000);
     finishGame(game);
     expect(project(game, 'player', 'p1', 86000).standings[0].score).toBe(1);
@@ -238,10 +238,8 @@ describe('live quiz rules', () => {
     submitAnswer(game, 'p1', 'alex', 2000);
     submitAnswer(game, 'p2', 'alex', 2000);
     submitAnswer(game, 'p3', 'sam', 2000);
-    endAudio(game, 61000, game.runId);
-    advance(game, 76000);
     expect(project(game, 'screen', undefined, 76000).votes).toBeUndefined();
-    reveal(game, 80000);
+    endAudio(game, 80000, game.runId);
     expect(project(game, 'player', 'p1', 81000).votes).toBeUndefined();
     advance(game, 85000);
     expect(project(game, 'player', 'p1', 85000).votes).toEqual([

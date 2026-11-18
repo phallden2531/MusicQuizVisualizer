@@ -219,11 +219,6 @@ describe('live transport', () => {
       positionMs: quiz.songs[0].durationMs,
       runId: roundRun,
     });
-    now += 15000;
-    await runtime.service.tick();
-    await agent
-      .post('/api/game/command')
-      .send({ command: 'reveal', requestId: 'reveal-fifteen', runId: roundRun });
     now += 5000;
     await runtime.service.tick();
     const results = await Promise.all(players.map((player) => ack(player, 'snapshot', {})));
@@ -300,12 +295,7 @@ describe('live transport', () => {
       positionMs: quiz.songs[0].durationMs,
       runId: liveRun,
     });
-    now += 15000;
-    await runtime.service.tick();
-    expect(runtime.service.state.game!.phase).toBe('locked');
-    await agent
-      .post('/api/game/command')
-      .send({ command: 'reveal', requestId: 'reveal-1', runId: liveRun });
+    expect(runtime.service.state.game!.phase).toBe('revealing');
     const imageResponse = await request(runtime.app)
       .get(`/api/games/${room}/image`)
       .set('Authorization', `Bearer ${joined.body.token}`);

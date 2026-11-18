@@ -56,7 +56,7 @@ export const joinSchema = z.object({
     .regex(/^[^\p{Cc}\p{Cf}]+$/u, 'Use a readable nickname.'),
 });
 export const commandSchema = z.object({
-  command: z.enum(['start', 'pause', 'resume', 'reveal', 'finish']),
+  command: z.enum(['start', 'pause', 'resume', 'end', 'finish']),
   requestId: z.string().min(1).max(100),
   runId: z.string().uuid(),
 });

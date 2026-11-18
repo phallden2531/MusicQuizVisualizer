@@ -6,7 +6,7 @@ import {
   type CSSProperties,
   type ReactNode,
 } from 'react';
-import { Check, Pause, Trophy, WifiOff } from 'lucide-react';
+import { Check, Trophy, WifiOff } from 'lucide-react';
 import QRCode from 'qrcode';
 import type { GameView, Standing, Vote } from '../shared/types';
 
@@ -211,29 +211,6 @@ export function RoundTag({ state }: { state: GameView }) {
       Song <strong>{String(state.roundIndex + 1).padStart(2, '0')}</strong>
       <span>of {String(state.totalRounds).padStart(2, '0')}</span>
     </span>
-  );
-}
-export function Countdown({ state, now }: { state: GameView; now: number }) {
-  if (state.phase !== 'grace') return null;
-  const seconds = state.deadline ? Math.max(0, Math.ceil((state.deadline - now) / 1000)) : null;
-  return (
-    <div className="last-call" role="timer">
-      <div>
-        <strong>Last call for guesses</strong>
-        <span>The music has stopped.</span>
-      </div>
-      {seconds === null ? (
-        <Ticket className="countdown-number is-paused">
-          <Pause size={26} />
-          <small>PAUSED</small>
-        </Ticket>
-      ) : (
-        <Ticket className="countdown-number">
-          {seconds}
-          <small>SEC</small>
-        </Ticket>
-      )}
-    </div>
   );
 }
 export function Reveal({ state, now }: { state: GameView; now: number }) {

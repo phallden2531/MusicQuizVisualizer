@@ -16,7 +16,7 @@ export interface Quiz {
   colleagues: Colleague[];
   songs: Song[];
 }
-export type Phase = 'lobby' | 'playing' | 'grace' | 'locked' | 'revealing' | 'results' | 'finished';
+export type Phase = 'lobby' | 'playing' | 'revealing' | 'results' | 'finished';
 export interface Player {
   id: string;
   token: string;
@@ -41,8 +41,6 @@ export interface Game {
   elapsedMs: number;
   clockAt: number | null;
   playbackPositionMs: number;
-  deadline: number | null;
-  graceRemainingMs: number;
   revealEndsAt: number | null;
   heartbeatAt: number;
 }
@@ -77,7 +75,6 @@ export interface GameView {
   myAnswer?: { colleagueId: string };
   myResult?: { correct: boolean; points: number };
   playerId?: string;
-  deadline: number | null;
   revealEndsAt: number | null;
   imageUrl?: string;
   correctName?: string;

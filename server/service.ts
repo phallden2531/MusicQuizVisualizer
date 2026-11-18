@@ -6,6 +6,7 @@ import {
   advance,
   createGame,
   endAudio,
+  endRound,
   finishGame,
   joinGame,
   pause,
@@ -14,7 +15,6 @@ import {
   removePlayer,
   requireRule,
   resume,
-  reveal,
   startRound,
   submitAnswer,
 } from './game.js';
@@ -62,7 +62,7 @@ export class QuizService extends EventEmitter {
    */
   private mutate<T>(operation: (state: AppState, now: number) => T, heartbeat = false): Promise<T> {
     // Capture arrival before waiting on earlier Blob writes. Queue latency must
-    // never change an answer's score or its eligibility at the deadline.
+    // never change whether an answer arrived before the round closed.
     const receivedAt = this.now();
     const task = this.queue.then(async () => {
       const before = JSON.stringify(this.state);
@@ -199,7 +199,7 @@ export class QuizService extends EventEmitter {
     if (this.screenId !== socketId) return;
     this.screenId = null;
     this.readySongId = null;
-    if (this.state.game && ['playing', 'grace'].includes(this.state.game.phase)) {
+    if (this.state.game?.phase === 'playing') {
       await this.mutate((state, now) => {
         pause(state.game!, now, 'Presentation screen disconnected. Reconnect it, then resume.');
       });
@@ -217,7 +217,7 @@ export class QuizService extends EventEmitter {
     this.emit('change');
   }
   async command(
-    command: 'start' | 'pause' | 'resume' | 'reveal' | 'finish',
+    command: 'start' | 'pause' | 'resume' | 'end' | 'finish',
     requestId: string,
     expectedRunId: string,
   ) {
@@ -243,7 +243,7 @@ export class QuizService extends EventEmitter {
           'Reconnect the presentation screen and enable audio first.',
         );
         resume(game, now);
-      } else if (command === 'reveal') reveal(game, now);
+      } else if (command === 'end') endRound(game, now);
       else finishGame(game);
       state.commandIds = [...(state.commandIds ?? []), requestId].slice(-200);
     });
@@ -299,15 +299,14 @@ export class QuizService extends EventEmitter {
     if (!game || game.paused) return;
     const now = this.now();
     const timedTransition =
-      (game.phase === 'grace' && game.deadline !== null && now >= game.deadline) ||
-      (game.phase === 'revealing' && game.revealEndsAt !== null && now >= game.revealEndsAt);
+      game.phase === 'revealing' && game.revealEndsAt !== null && now >= game.revealEndsAt;
     const stalled = game.phase === 'playing' && now - game.heartbeatAt > STALL_MS;
     if (timedTransition || stalled)
       await this.mutate((state, currentNow) => {
         const live = state.game!;
         advance(live, currentNow);
         if (live.phase === 'playing' && currentNow - live.heartbeatAt > STALL_MS) {
-          // Stop the clock where the audio stopped, so silence costs nobody points.
+          // Stop the clock where the audio stopped, so silence is not answering time.
           // Never before a guess already recorded, which keeps elapsed times ordered.
           const answeredAt = Object.values(live.answers[live.roundIndex] ?? {}).map(
             (a) => a.submittedAt,

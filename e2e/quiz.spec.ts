@@ -63,16 +63,12 @@ test('host prepares a quiz and a mobile player completes a live round', async ({
   await expect(player.getByText('Your guess is locked')).toBeVisible();
   await player.reload();
   await expect(player.getByText('Your guess is locked')).toBeVisible();
-  await expect(player.getByText('Last call for guesses')).toBeVisible({ timeout: 15000 });
   await player.screenshot({ path: 'test-results/player-mobile.png', fullPage: true });
   expect(await player.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
     true,
   );
-  await expect(page.getByRole('button', { name: 'Reveal the colleague' })).toBeEnabled({
-    timeout: 20000,
-  });
-  await expect(player.getByText('Waiting for the big reveal')).toBeVisible();
-  await page.getByRole('button', { name: 'Reveal the colleague' }).click();
+  // Everyone has guessed, so the host can cut the song short.
+  await page.getByRole('button', { name: 'End round' }).click();
   await expect(player.getByText('Coming into focus')).toBeVisible();
   await expect(player.getByRole('heading', { name: 'Sam', exact: true })).toBeVisible({
     timeout: 10000,
@@ -146,23 +142,16 @@ test('presentation reconnect resumes a paused round and preloads the next song',
   await page.getByRole('button', { name: 'Resume round' }).click();
   await player.getByRole('button', { name: 'Sam', exact: true }).click();
   await player.getByRole('button', { name: /^Lock in / }).click();
-  await expect(page.getByRole('button', { name: 'Reveal the colleague' })).toBeEnabled({
-    timeout: 25000,
-  });
-  await page.getByRole('button', { name: 'Reveal the colleague' }).click();
+  // The reveal starts on its own when the song ends.
   await expect(player.getByRole('heading', { name: 'Sam', exact: true })).toBeVisible({
-    timeout: 10000,
+    timeout: 35000,
   });
   await expect(page.getByText('Presentation ready')).toBeVisible();
   await page.getByRole('button', { name: 'Start next song' }).click();
   await player.getByRole('button', { name: 'Alex', exact: true }).click();
   await player.getByRole('button', { name: /^Lock in / }).click();
-  await expect(page.getByRole('button', { name: 'Reveal the colleague' })).toBeEnabled({
-    timeout: 25000,
-  });
-  await page.getByRole('button', { name: 'Reveal the colleague' }).click();
   await expect(player.getByRole('heading', { name: 'Alex', exact: true })).toBeVisible({
-    timeout: 10000,
+    timeout: 35000,
   });
   await page.getByRole('button', { name: 'Show final standings' }).click();
   await expect(player.getByRole('heading', { name: 'That’s a wrap.' })).toBeVisible();

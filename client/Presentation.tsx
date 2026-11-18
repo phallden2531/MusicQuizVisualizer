@@ -4,7 +4,6 @@ import {
   Badge,
   Brand,
   ConnectionNotice,
-  Countdown,
   Equalizer,
   ErrorNotice,
   FittedLyrics,
@@ -23,7 +22,7 @@ import { useGame, useNow } from './useGame';
 export function Presentation({ roomCode }: { roomCode: string }) {
   const live = useGame('screen', roomCode);
   const { state, emit, connected } = live;
-  const now = useNow(live.offset, state?.phase === 'grace' || state?.phase === 'revealing');
+  const now = useNow(live.offset, state?.phase === 'revealing');
   const [enabled, setEnabled] = useState(false);
   const [error, setError] = useState('');
   const [loaded, setLoaded] = useState(false);
@@ -261,7 +260,7 @@ export function Presentation({ roomCode }: { roomCode: string }) {
                   {state.answerCount} OF {state.players.length} GUESSES LOCKED
                 </span>
               </div>
-              {['playing', 'grace', 'locked'].includes(state.phase) ? (
+              {state.phase === 'playing' ? (
                 <>
                   <div className="screen-song-heading">
                     <NameTag tone="red" size="sm" tilt={-5} className="mystery-tag">
@@ -274,22 +273,11 @@ export function Presentation({ roomCode }: { roomCode: string }) {
                     <FittedLyrics text={state.lyrics ?? ''} />
                   </div>
                   <div className="screen-round-bottom">
-                    {state.phase === 'grace' ? (
-                      <Countdown state={state} now={now} />
-                    ) : state.phase === 'locked' ? (
-                      <div className="screen-locked">
-                        <h2>Some secrets are worth waiting for.</h2>
-                        <p className="muted">Your host will reveal the colleague.</p>
-                      </div>
-                    ) : (
-                      <>
-                        <span className="now-playing">
-                          <Equalizer />
-                          {state.paused ? 'INTERMISSION' : 'NOW PLAYING'}
-                        </span>
-                        <p>Trust the lyrics. Not the names.</p>
-                      </>
-                    )}
+                    <span className="now-playing">
+                      <Equalizer />
+                      {state.paused ? 'INTERMISSION' : 'NOW PLAYING'}
+                    </span>
+                    <p>Trust the lyrics. Not the names.</p>
                   </div>
                 </>
               ) : (

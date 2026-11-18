@@ -261,7 +261,7 @@ A deep, slightly violet navy carries four sticker inks (red, yellow, pink, teal)
 
 ### Secondary
 
-- **Raffle Yellow** (`raffle-yellow`): the default raffle ticket (room invite, join-code ticket, countdown), the emphasised second clause of a headline, the leader's rank, the correct row in the vote bars, count chips on active tabs, track numbers, the focus ring and text selection. It means "this one" or "look here".
+- **Raffle Yellow** (`raffle-yellow`): the default raffle ticket (room invite, join-code ticket), the emphasised second clause of a headline, the leader's rank, the correct row in the vote bars, count chips on active tabs, track numbers, the focus ring and text selection. It means "this one" or "look here".
 
 ### Tertiary
 
@@ -309,13 +309,13 @@ Every size comes from one ramp, set as `--fs-*` tokens on `:root`; nothing in th
 
 - **Display** (800, `--fs-display` `clamp(2.6rem, 6.2vw, 5.4rem)`, line-height 0.98, -0.04em): home and login hero headlines. On the projector: **Stage Display** `clamp(3rem, 6vw, 7rem)` for the finale, **Stage Headline** `clamp(2.2rem, 3.8vw, 4.8rem)` for the lobby headline, song heading and access screens, **Stage Title** `clamp(2rem, 2.8vw, 3.6rem)` for the leaderboard heading.
 - **Headline** (800, `--fs-headline` `clamp(2.2rem, 4.4vw, 3.6rem)`, 1.02, -0.03em): host page headings. **Phone Headline** `clamp(2.2rem, 10vw, 3.2rem)` is the one size for every phone h1.
-- **Heading** (800, 2.25rem): empty-state and live-room status headings. **Title** (800, 1.75rem): sheet headings, the phone's "The usual suspects", reveal captions. **Subtitle** (800, 1.375rem): last call, small section headings. **Figure** (800, 2.5rem, tabular): room codes, metrics and countdown digits in app UI.
+- **Heading** (800, 2.25rem): empty-state and live-room status headings. **Title** (800, 1.75rem): sheet headings, the phone's "The usual suspects", reveal captions. **Subtitle** (800, 1.375rem): small section headings. **Figure** (800, 2.5rem, tabular): room codes and metrics in app UI.
 - **Body** (400, 1rem, line-height 1.55, pretty wrap): copy and notices. **Lead** (1.125rem): intros (max 34em), emphasised lines and marker names in lists. **Small** (0.875rem): field labels, notes, footers, status lines.
 - **Lyrics** (phone: Lead 1.125rem / 1.65; projector: weight 500, line-height 1.5, fitted to the panel and balanced into columns with a navy-600 rule).
 - **Label** (700, 0.75rem, +0.1em tracking, written in capitals): table column headers, field hints beside a field label, metric captions. **Micro** (800, 0.625rem): the printed HELLO on suspect badges and the YOU chip.
 - **Tag HELLO** (800, 3em of the tag's base size, 0.95): the word HELLO on a name tag; "my name is" below it at 650, 1.1em.
 - **Marker Name** (Permanent Marker, 2.3em of the tag's base size, 1.12): every person's name: tag strips, badges, suspects, standings, vote rows, and the brand name "Off the Record".
-- **Serial** (800, tabular numerals, `clamp(3rem, 5vw, 6rem)` on the projector, +0.08em): room codes, countdown digits and score totals.
+- **Serial** (800, tabular numerals, `clamp(3rem, 5vw, 6rem)` on the projector, +0.08em): room codes and score totals.
 
 Headings are weight 800 with negative tracking and balanced wrapping; numbers in scores, ranks, timers and tallies are always tabular.
 
@@ -379,7 +379,7 @@ _The HELLO my-name-is sticker; the product's central object._
 _The carrier for codes and numbers._
 
 - **Shape:** notched sides, 10px corners, default Raffle Yellow with ink text; tones match the name tag.
-- **Uses:** the projector invite (QR on paper, room code as its serial below a dotted line, tilted 2.5 degrees), the home join-code ticket (dashed ink-bordered paper input, letter-spaced code, tilted -1.2 degrees), the countdown (tilted 2 degrees, tabular digits), the host invite row and the phone's personal result (yellow for right, pink for wrong, points after a dotted divider).
+- **Uses:** the projector invite (QR on paper, room code as its serial below a dotted line, tilted 2.5 degrees), the home join-code ticket (dashed ink-bordered paper input, letter-spaced code, tilted -1.2 degrees), the host invite row and the phone's personal result (yellow for right, pink for wrong, points after a dotted divider).
 
 ### Guest Badge
 
@@ -454,7 +454,7 @@ _The host's working surface._
 - **Do** set every person's name in Permanent Marker on paper (or in yellow when it is the viewer's own or the correct one), and everything else in Bricolage Grotesque.
 - **Do** pair tone and text with the `tone-*` classes: paper on red, ink on yellow, pink and teal.
 - **Do** give tags, tickets and badges a small tilt and the single object shadow; keep sheets, inputs and buttons level.
-- **Do** put codes, countdowns and scores on a raffle ticket or in tabular weight-800 numerals.
+- **Do** put codes and scores on a raffle ticket or in tabular weight-800 numerals.
 - **Do** use the slap-on settle (0.55 to 0.6s, exponential ease-out) when something is stuck down, and only then.
 - **Do** keep the true answer as a red name tag, revealed only at the reveal.
 - **Do** size projector content in em and viewport units off the shell's clamped base.

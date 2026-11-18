@@ -830,47 +830,6 @@ label[for] > span {
   font-weight: 800;
 }
 
-/* ---------- Last call ---------- */
-.last-call {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-  margin: 16px 0;
-}
-.last-call strong {
-  display: block;
-  font-size: var(--fs-subtitle);
-  font-weight: 800;
-  letter-spacing: -0.02em;
-}
-.last-call span {
-  color: var(--muted);
-}
-.sheet .last-call span {
-  color: var(--ink-muted);
-}
-.countdown-number {
-  --notch: 9px;
-  display: grid;
-  justify-items: center;
-  min-width: 112px;
-  padding: 10px 20px 12px;
-  font-size: var(--fs-figure);
-  font-weight: 800;
-  line-height: 1;
-  font-variant-numeric: tabular-nums;
-  transform: rotate(2deg);
-}
-.countdown-number small {
-  font-size: var(--fs-caption);
-  letter-spacing: 0.12em;
-  margin-top: 4px;
-}
-.countdown-number.is-paused {
-  font-size: var(--fs-body);
-}
-
 /* ---------- The reveal ---------- */
 .reveal {
   display: grid;
@@ -2015,23 +1974,6 @@ label[for] > span {
   letter-spacing: 0.1em;
   color: var(--yellow);
 }
-.screen-round-bottom .last-call {
-  flex: 1;
-  margin: 0;
-}
-.screen-round-bottom .last-call strong {
-  font-size: 2em;
-}
-.screen-round-bottom .countdown-number {
-  font-size: 3.4em;
-  min-width: 3.4em;
-}
-.screen-locked h2 {
-  font-size: 1.8em;
-}
-.screen-locked p {
-  margin-top: 4px;
-}
 .screen-results {
   flex: 1;
   display: grid;
@@ -2471,15 +2413,6 @@ details.lyrics-card[open] > summary {
 }
 .player-round .notice svg {
   flex: none;
-}
-.waiting-reveal {
-  display: grid;
-  gap: 6px;
-  margin: 28px 0 24px;
-  text-align: center;
-}
-.waiting-reveal h2 {
-  font-size: var(--fs-title);
 }
 .player-round .vote {
   grid-template-columns: 1fr 2.5ch;

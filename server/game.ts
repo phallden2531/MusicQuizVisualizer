@@ -48,8 +48,6 @@ export function createGame(quiz: Quiz, roomCode: string, now: number): Game {
     elapsedMs: 0,
     clockAt: null,
     playbackPositionMs: 0,
-    deadline: null,
-    graceRemainingMs: 15000,
     revealEndsAt: null,
     heartbeatAt: now,
   };
@@ -73,8 +71,7 @@ export function removePlayer(game: Game, id: string) {
   game.players = game.players.filter((p) => p.id !== id);
 }
 export function activeElapsed(game: Game, now: number) {
-  const end = game.phase === 'grace' && game.deadline ? Math.min(now, game.deadline) : now;
-  return game.elapsedMs + (game.clockAt === null ? 0 : Math.max(0, end - game.clockAt));
+  return game.elapsedMs + (game.clockAt === null ? 0 : Math.max(0, now - game.clockAt));
 }
 export function startRound(game: Game, now: number) {
   requireRule(
@@ -93,28 +90,37 @@ export function startRound(game: Game, now: number) {
   game.elapsedMs = 0;
   game.clockAt = now;
   game.playbackPositionMs = 0;
-  game.deadline = null;
-  game.graceRemainingMs = 15000;
   game.revealEndsAt = null;
   game.heartbeatAt = now;
   game.answers[game.roundIndex] = {};
 }
+/** Closes answers and starts the five-second reveal straight away. */
+function closeRound(game: Game, now: number) {
+  game.elapsedMs = activeElapsed(game, now);
+  game.clockAt = null;
+  game.phase = 'revealing';
+  game.revealEndsAt = now + 5000;
+  game.heartbeatAt = now;
+}
 export function endAudio(game: Game, now: number, runId: string) {
   if (game.runId !== runId || game.phase !== 'playing' || game.paused) return;
-  game.phase = 'grace';
-  game.deadline = now + 15000;
-  game.graceRemainingMs = 15000;
   game.playbackPositionMs = game.quiz.songs[game.roundIndex].durationMs;
-  game.heartbeatAt = now;
+  closeRound(game, now);
+}
+/** The host may cut the song short once every player has locked a guess. */
+export function endRound(game: Game, now: number) {
+  advance(game, now);
+  if (game.phase === 'revealing' || game.phase === 'results') return;
+  requireRule(game.phase === 'playing', 'There is no round to end.');
+  requireRule(!game.paused, 'Resume the round first.');
+  requireRule(
+    game.players.length > 0 && game.players.every((p) => game.answers[game.roundIndex][p.id]),
+    'Wait until everyone has locked a guess.',
+  );
+  closeRound(game, now);
 }
 export function advance(game: Game, now: number): boolean {
   if (game.paused) return false;
-  if (game.phase === 'grace' && game.deadline !== null && now >= game.deadline) {
-    game.elapsedMs = activeElapsed(game, game.deadline);
-    game.clockAt = null;
-    game.phase = 'locked';
-    return true;
-  }
   if (game.phase === 'revealing' && game.revealEndsAt !== null && now >= game.revealEndsAt) {
     game.phase = 'results';
     return true;
@@ -124,7 +130,7 @@ export function advance(game: Game, now: number): boolean {
 export function submitAnswer(game: Game, playerId: string, colleagueId: string, now: number) {
   advance(game, now);
   requireRule(!game.paused, 'The round is paused. Please wait.');
-  requireRule(game.phase === 'playing' || game.phase === 'grace', 'Answers are closed.');
+  requireRule(game.phase === 'playing', 'Answers are closed.');
   requireRule(
     game.players.some((p) => p.id === playerId),
     'Player not found.',
@@ -141,22 +147,11 @@ export function submitAnswer(game: Game, playerId: string, colleagueId: string, 
     submittedAt: now,
   };
 }
-export function reveal(game: Game, now: number) {
-  advance(game, now);
-  if (game.phase === 'revealing' || game.phase === 'results') return;
-  requireRule(game.phase === 'locked', 'Wait until answers have closed.');
-  game.phase = 'revealing';
-  game.revealEndsAt = now + 5000;
-}
 export function pause(game: Game, now: number, reason: string) {
   advance(game, now);
-  if (game.paused || (game.phase !== 'playing' && game.phase !== 'grace')) return;
+  if (game.paused || game.phase !== 'playing') return;
   game.elapsedMs = activeElapsed(game, now);
   game.clockAt = null;
-  if (game.phase === 'grace' && game.deadline !== null) {
-    game.graceRemainingMs = Math.max(0, game.deadline - now);
-    game.deadline = null;
-  }
   game.paused = true;
   game.pauseReason = reason;
 }
@@ -167,11 +162,16 @@ export function resume(game: Game, now: number) {
   game.clockAt = now;
   game.runId = randomUUID();
   game.heartbeatAt = now;
-  if (game.phase === 'grace') game.deadline = now + game.graceRemainingMs;
 }
 export function recover(game: Game, now: number) {
+  // Games saved before the answer countdown was removed may sit in its old phases.
+  if (['grace', 'locked'].includes(game.phase as string)) {
+    game.paused = false;
+    game.pauseReason = null;
+    closeRound(game, now);
+  }
   // Use the last persisted playback heartbeat, never count server downtime as answering time.
-  if (!game.paused && (game.phase === 'playing' || game.phase === 'grace')) {
+  if (!game.paused && game.phase === 'playing') {
     pause(
       game,
       Math.max(game.clockAt ?? game.heartbeatAt, game.heartbeatAt),
@@ -191,7 +191,6 @@ export function finishGame(game: Game) {
   game.paused = false;
   game.pauseReason = null;
   game.clockAt = null;
-  game.deadline = null;
   game.revealEndsAt = null;
 }
 /** The last round whose answer the room has seen. */
@@ -268,7 +267,6 @@ export function project(
     })),
     answerCount: Object.keys(game.answers[game.roundIndex] ?? {}).length,
     standings: standings(game),
-    deadline: game.deadline,
     revealEndsAt: game.revealEndsAt,
   };
   if (playerId) view.playerId = playerId;

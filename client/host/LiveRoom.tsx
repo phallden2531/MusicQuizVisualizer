@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import type { GameView } from '../../shared/types';
 import { api } from '../api';
-import { Badge, Countdown, QR, Standings, Ticket, tones, Votes } from '../components';
+import { Badge, QR, Standings, Ticket, tones, Votes } from '../components';
 
 const clock = (ms: number) =>
   `${Math.floor(ms / 60000)}:${String(Math.floor(ms / 1000) % 60).padStart(2, '0')}`;
@@ -57,6 +57,7 @@ export function LiveRoom({
     }
   }
   const position = playbackPosition(game, now);
+  const allGuessed = game.players.length > 0 && game.answerCount === game.players.length;
   return (
     <main className="live-host">
       <div className="studio-heading">
@@ -97,8 +98,6 @@ export function LiveRoom({
                 : {
                     lobby: 'Ready when you are.',
                     playing: 'Let the music play.',
-                    grace: 'One last chance.',
-                    locked: 'The guesses are in.',
                     revealing: 'A familiar face appears.',
                     results: 'The truth is out.',
                     finished: 'That’s a wrap.',
@@ -109,9 +108,11 @@ export function LiveRoom({
             ) : game.phase === 'lobby' ? (
               <p className="muted">Next up: {game.nextSongTitle}</p>
             ) : game.phase === 'playing' ? (
-              <p className="muted">Players are listening and reading the lyrics.</p>
-            ) : game.phase === 'locked' ? (
-              <p className="muted">Build the suspense. Reveal the colleague when you’re ready.</p>
+              <p className="muted">
+                {allGuessed
+                  ? 'Everyone has guessed. End the round to reveal the colleague now.'
+                  : 'Players are listening and reading the lyrics.'}
+              </p>
             ) : game.phase === 'results' ? (
               <p className="muted">
                 {game.nextSongTitle
@@ -138,7 +139,6 @@ export function LiveRoom({
               </div>
             )}
           </div>
-          <Countdown state={game} now={now} />
           <div className="live-metrics">
             <div>
               <strong>
@@ -155,7 +155,7 @@ export function LiveRoom({
               <span>GUESSES LOCKED</span>
             </div>
           </div>
-          {['playing', 'grace', 'locked'].includes(game.phase) && (
+          {game.phase === 'playing' && (
             <div className="player-chips answer-chips" aria-label="Who has guessed">
               {game.players.map((p) => (
                 <span key={p.id} className={p.answered ? 'answered' : ''}>
@@ -184,15 +184,6 @@ export function LiveRoom({
                 <Play size={17} />
                 Start first song
               </button>
-            ) : game.phase === 'locked' ? (
-              <button
-                className="button button-primary button-full"
-                disabled={busy || !connected}
-                onClick={() => command('reveal')}
-              >
-                <Sparkles size={17} />
-                Reveal the colleague
-              </button>
             ) : game.phase === 'results' ? (
               <button
                 className="button button-primary button-full"
@@ -208,15 +199,27 @@ export function LiveRoom({
                   ? 'Start next song'
                   : 'Show final standings'}
               </button>
-            ) : ['playing', 'grace'].includes(game.phase) ? (
-              <button
-                className="button button-secondary button-full"
-                disabled={busy || !connected}
-                onClick={() => command('pause')}
-              >
-                <Pause size={17} />
-                Pause round
-              </button>
+            ) : game.phase === 'playing' ? (
+              <>
+                {allGuessed && (
+                  <button
+                    className="button button-primary button-full"
+                    disabled={busy || !connected}
+                    onClick={() => command('end')}
+                  >
+                    <Sparkles size={17} />
+                    End round
+                  </button>
+                )}
+                <button
+                  className="button button-secondary button-full"
+                  disabled={busy || !connected}
+                  onClick={() => command('pause')}
+                >
+                  <Pause size={17} />
+                  Pause round
+                </button>
+              </>
             ) : game.phase === 'finished' ? (
               <button className="button button-secondary button-full" onClick={onBackToStudio}>
                 <ListMusic size={17} />
